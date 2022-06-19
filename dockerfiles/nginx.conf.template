@@ -10,10 +10,12 @@ server {
 
   location /app {
     root /usr/share/nginx/;
+    try_files $uri /index.html;
   }
 
   location / {
     root /usr/share/nginx/website/;
+    try_files $uri /index.html;
   }
 
   location /static {
