@@ -434,9 +434,9 @@ class AudioAnnotator extends Component<AudioAnnotatorProps, AudioAnnotatorState>
         const campaignId: number = result.body.campaign_id;
 
         if (nextTask) {
-          window.location.href = '/app/audio-annotator/' + nextTask.toString();
+          window.location.href = '../' + nextTask.toString();
         } else {
-          window.location.href = '/app/annotation_tasks/' + campaignId.toString();
+          window.location.href = '../../annotation_tasks/' + campaignId.toString();
         }
       })
       .catch(err => {
