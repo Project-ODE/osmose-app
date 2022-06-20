@@ -76,6 +76,9 @@ type AudioAnnotatorProps = {
     },
   },
   app_token: string,
+  history: {
+    push: (url: string) => void
+  },
 };
 
 type AudioAnnotatorState = {
@@ -120,9 +123,7 @@ class AudioAnnotator extends Component<AudioAnnotatorProps, AudioAnnotatorState>
     };
   }
 
-  componentDidMount() {
-    const taskId: number = this.props.match.params.annotation_task_id;
-
+  retrieveTask(taskId: number) {
     // Retrieve current task
     request.get(API_URL + taskId.toString())
       .set('Authorization', 'Bearer ' + this.props.app_token)
@@ -191,6 +192,20 @@ class AudioAnnotator extends Component<AudioAnnotatorProps, AudioAnnotatorState>
           this.setState({isLoading: false, error: this.buildErrorMessage(err)});
         }
       });
+  }
+
+  componentDidMount() {
+    const taskId: number = this.props.match.params.annotation_task_id;
+    this.retrieveTask(taskId);
+  }
+
+  componentDidUpdate(prevProps: AudioAnnotatorProps) {
+    const prevTaskId: number = prevProps.match.params.annotation_task_id;
+    const taskId: number = this.props.match.params.annotation_task_id;
+
+    if (prevTaskId !== taskId) {
+      this.retrieveTask(taskId);
+    }
   }
 
   buildErrorMessage = (err: any) => {
@@ -435,10 +450,8 @@ class AudioAnnotator extends Component<AudioAnnotatorProps, AudioAnnotatorState>
 
         if (nextTask) {
           this.props.history.push('/audio-annotator/' + nextTask.toString());
-          window.location.reload();
         } else {
           this.props.history.push('/annotation_tasks/' + campaignId.toString());
-          window.location.reload();
         }
       })
       .catch(err => {
