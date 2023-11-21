@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from backend.api.models import News
 from backend.api.serializers import NewsSerializer
 
+from datetime import datetime
+
 
 class NewsViewSet(viewsets.ViewSet):
     """
@@ -23,7 +25,8 @@ class NewsViewSet(viewsets.ViewSet):
     def list(self, request):
         """List news"""
         serializer = self.serializer_class(self.queryset, many=True)
-        return Response(serializer.data)
+        response = sorted(serializer.data, key=lambda item: datetime.strptime(item["date"], "%Y-%m-%d"), reverse=True)
+        return Response(response)
 
     def retrieve(self, request, pk=None):
         """Show a specific news"""
