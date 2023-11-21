@@ -1,0 +1,6 @@
+div.carousel div.carousel-item div.card img.card-img {
+    max-height: 30vh;
+}
+div.carousel button {
+    width: 3rem;
+}
