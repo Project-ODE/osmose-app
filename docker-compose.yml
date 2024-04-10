@@ -23,6 +23,7 @@ services:
     read_only: true
     volumes:
       - static:/opt/staticfiles:ro
+      - back-tmp:/tmp
       - ./volumes/datawork:/opt/datawork:ro
     restart: always
 
@@ -66,3 +67,4 @@ services:
 volumes:
   https-portal-data:
   static:
+  back-tmp:

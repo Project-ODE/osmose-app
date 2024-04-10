@@ -107,7 +107,7 @@ const AnnotationItem: React.FC<ItemProps> = ({ annotation }) => {
           </td> }
         </tr>
       );
-    case AnnotationType.label:
+    case AnnotationType.tag:
       return (
         <tr
           className={ annotation.id === focusedResult?.id && annotation.newId === focusedResult?.newId ? "isActive" : "" }

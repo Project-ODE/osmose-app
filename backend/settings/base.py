@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "backend.api.apps.ApiConfig",
     "backend.osmosewebsite.apps.OsmoseWebsiteConfig",
     "tinymce",
+    "metadatax",
 ]
 
 MIDDLEWARE = [

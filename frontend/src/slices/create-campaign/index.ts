@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   DatasetListItem as Dataset,
-  DatasetListItemSpectros as SpectroConfig,
   ConfidenceSetListItem as ConfidenceSet,
 } from "@/services/api"
 import { Usage } from "@/types/annotations.ts";
 import { CSVDetectorItem, AnnotationsCSV } from "@/types/csv-import-annotations.ts";
 import { User } from '@/types/user.ts';
 import { LabelSet } from "@/types/label.ts";
+import { SpectrogramConfiguration } from "@/types/process-metadata/spectrograms.ts";
 
 
 
@@ -18,7 +18,7 @@ export type CreateCampaignSlice = {
   deadline: string | undefined;
 
   dataset: Dataset | undefined;
-  datasetSpectroConfigs: Array<SpectroConfig>;
+  datasetSpectroConfigs: Array<SpectrogramConfiguration>;
 
   usage: Usage | undefined;
   labelSet: LabelSet | undefined;
@@ -68,7 +68,7 @@ export const createCampaignSlice = createSlice({
     updateDataset: (state, action: { payload: Dataset | undefined }) => {
       state.dataset = action.payload;
     },
-    updateDatasetSpectroConfigs: (state, action: { payload: Array<SpectroConfig> | undefined }) => {
+    updateDatasetSpectroConfigs: (state, action: { payload: Array<SpectrogramConfiguration> | undefined }) => {
       state.datasetSpectroConfigs = action.payload ?? [];
     },
 

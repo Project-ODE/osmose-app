@@ -5,6 +5,7 @@ import './searchbar.component.css';
 import { searchFilter } from "@/services/utils/search.ts";
 
 interface Props {
+  placeholder: string;
   values: Array<Item>;
   onValueSelected: (value: Item) => void;
 }
@@ -20,6 +21,7 @@ export const Searchbar: React.FC<Props & HTMLAttributes<HTMLIonSearchbarElement>
   return (
     <div id="searchbar" className={ !search ? '' : 'got-results' }>
       <IonSearchbar { ...props }
+                    placeholder={ props.placeholder }
                     ref={ searchbarRef }
                     value={ search }
                     onIonInput={ e => setSearch(e.detail.value ?? undefined) }></IonSearchbar>
