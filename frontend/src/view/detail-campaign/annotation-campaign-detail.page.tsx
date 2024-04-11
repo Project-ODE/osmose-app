@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { AnnotationCampaignRetrieveCampaign, useAnnotationCampaignAPI, useUsersAPI, } from "@/services/api";
 import { AnnotationTaskStatus } from "@/types/annotations.ts";
 import { IonButton, IonIcon, IonProgressBar, useIonAlert } from "@ionic/react";
@@ -33,6 +33,7 @@ export const AnnotationCampaignDetail: React.FC = () => {
   const userService = useUsersAPI();
   const [error, setError] = useState<any | undefined>(undefined);
   const [presentAlert, dismissAlert] = useIonAlert();
+  const history = useHistory()
 
   useEffect(() => {
     let isCancelled = false;
@@ -82,7 +83,7 @@ export const AnnotationCampaignDetail: React.FC = () => {
 
   const openEditCampaign = () => {
     if (!annotationCampaign) return;
-    window.open(`/annotation_campaign/${ annotationCampaign?.id }/edit`, "_self")
+    history.push(`/annotation_campaign/${ annotationCampaign?.id }/edit`)
   }
 
   const archive = async () => {

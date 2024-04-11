@@ -7,6 +7,7 @@ import { ANNOTATOR_GUIDE_URL } from "@/consts/links.ts";
 import { searchFilter } from "@/services/utils/search.ts";
 import { CampaignCard } from "@/view/list-campaign/campaign-card/campaign-card.component.tsx";
 import './annotation-campaign-list.page.css'
+import { useHistory } from "react-router-dom";
 
 
 export const AnnotationCampaignList: React.FC = () => {
@@ -34,6 +35,7 @@ export const AnnotationCampaignList: React.FC = () => {
   // Services
   const campaignService = useAnnotationCampaignAPI();
   const toast = useToast();
+  const history = useHistory()
 
   useEffect(() => {
     let isCancelled = false;
@@ -60,7 +62,7 @@ export const AnnotationCampaignList: React.FC = () => {
   }
 
   const openNewCampaign = () => {
-    window.open("/create-annotation-campaign", "_self")
+    history.push("/create-annotation-campaign")
   }
 
   const toggleArchived = () => {
