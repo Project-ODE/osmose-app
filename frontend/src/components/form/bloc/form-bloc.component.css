@@ -13,5 +13,5 @@
 }
 #form-bloc #separator > div {
   height: 1px;
-  border-bottom: 1px solid var(--ion-color-secondary);
+  border-bottom: 1px solid var(--ion-color-medium);
 }

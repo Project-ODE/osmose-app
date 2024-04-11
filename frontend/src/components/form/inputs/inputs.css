@@ -36,6 +36,7 @@
   background: var(--ion-color-light-shade);
   padding: 0.5rem 1rem;
   outline-color: var(--ion-color-primary);
+  accent-color: var(--ion-color-primary);
 }
 #aplose-input #input > .hide-real-input {
   position: absolute;
