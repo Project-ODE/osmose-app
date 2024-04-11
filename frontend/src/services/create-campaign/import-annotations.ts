@@ -150,8 +150,8 @@ export const useImportAnnotations = () => {
                   selected: false,
                 },
                 is_box: !!+d.is_box,
-                confidence_indicator_level: confidenceLevel.length > 0 ? +confidenceLevel[0] : undefined,
-                confidence_indicator_max_level: confidenceLevel.length > 1 ? +confidenceLevel[1] : undefined,
+                confidence_indicator_level: confidenceLevel?.length > 0 ? +confidenceLevel[0] : undefined,
+                confidence_indicator_max_level: confidenceLevel?.length > 1 ? +confidenceLevel[1] : undefined,
               }
             })
           ));
