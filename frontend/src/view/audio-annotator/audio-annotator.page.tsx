@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, Fragment } from 'react';
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { IonButton, IonIcon, IonSpinner } from "@ionic/react";
 import { downloadOutline, helpCircle, informationCircle, pause, play } from "ionicons/icons";
 
@@ -116,6 +116,7 @@ export const AudioAnnotator: React.FC = () => {
 
   const taskAPI = useAnnotationTaskAPI();
   const userAPI = useUsersAPI();
+  const history = useHistory()
 
   const {
     areShortcutsEnabled,
@@ -214,7 +215,7 @@ export const AudioAnnotator: React.FC = () => {
   }
 
   const goBack = () => {
-    window.open(`/annotation_tasks/${ campaignId }`, "_self")
+    history.push(`/annotation_tasks/${ campaignId }`)
   }
 
   const downloadAudio = () => {
