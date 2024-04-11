@@ -134,7 +134,7 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, { start: Date
       <OverlayTrigger overlay={ <Tooltip><NavigationShortcutOverlay shortcut={ <IonIcon icon={ caretBack }/> }
                                                                     description="load previous recording"/></Tooltip> }>
         <IonButton color={ "primary" }
-                   disabled={ isSubmitting }
+                   disabled={ isSubmitting || !siblings.prev }
                    className="rounded-right-0"
                    onClick={ navPrevious }>
           <IonIcon icon={ caretBack } slot={ "icon-only" }/>
@@ -152,7 +152,7 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, { start: Date
       <OverlayTrigger overlay={ <Tooltip><NavigationShortcutOverlay shortcut={ <IonIcon icon={ caretForward }/> }
                                                                     description="load next recording"/></Tooltip> }>
         <IonButton color={ "primary" }
-                   disabled={ isSubmitting }
+                   disabled={ isSubmitting || !siblings.next }
                    className="rounded-left-0"
                    onClick={ navNext }>
           <IonIcon icon={ caretForward } slot={ "icon-only" }/>
