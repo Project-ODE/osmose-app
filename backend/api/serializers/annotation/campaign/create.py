@@ -169,18 +169,21 @@ class AnnotationCampaignCreateCheckAnnotationsSerializer(serializers.ModelSerial
         label_set.save()
 
         # Create confidence set
-        confidence_set = ConfidenceIndicatorSet.objects.create(
-            name=self.get_confidence_set_name(validated_data["name"] + "_set"),
-            desc="Confidence set for " + validated_data["name"] + " campaign",
-        )
+        confidence_set = None
         for data in validated_data["confidence_set_indicators"]:
             if data[0] is None or data[1] is None:
                 continue
+            if confidence_set is None:
+                confidence_set = ConfidenceIndicatorSet.objects.create(
+                    name=self.get_confidence_set_name(validated_data["name"] + "_set"),
+                    desc="Confidence set for " + validated_data["name"] + " campaign",
+                )
             confidence_set.confidence_indicators.get_or_create(
                 label=data[0],
                 level=data[1],
             )
-        confidence_set.save()
+        if confidence_set is not None:
+            confidence_set.save()
 
         # Create detectors
         for detector in validated_data["detectors"]:
