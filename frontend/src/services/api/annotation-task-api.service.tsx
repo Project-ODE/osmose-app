@@ -80,7 +80,7 @@ export interface RetrieveComment {
 
 export type AnnotationTaskDto = {
   id?: number,
-  annotation: string,
+  label: string,
   startTime: number | null,
   endTime: number | null,
   startFrequency: number | null,

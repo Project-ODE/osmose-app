@@ -89,7 +89,7 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, { start: Date
           id: r.id,
           startTime,
           endTime,
-          annotation: r.label,
+          label: r.label,
           startFrequency,
           endFrequency,
           confidenceIndicator: r.confidenceIndicator ?? null,
