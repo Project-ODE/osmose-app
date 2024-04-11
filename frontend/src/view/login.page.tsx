@@ -40,6 +40,7 @@ export const Login: FC = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!username || !password) return setError('You must enter your login and password');
+    if (['shom', 'chorus'].includes(username.toLowerCase())) return setError('403 Forbidden')
     setError(undefined);
 
     try {
