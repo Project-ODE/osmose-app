@@ -1,4 +1,4 @@
-export const ACCEPT_CSV_MIME_TYPE = 'text/csv';
+export const ACCEPT_CSV_MIME_TYPE = 'text/csv, application/vnd.ms-excel';
 export const ACCEPT_CSV_SEPARATOR = ',';
 export const IMPORT_ANNOTATIONS_COLUMNS = {
   required: [
