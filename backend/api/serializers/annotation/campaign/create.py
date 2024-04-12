@@ -203,7 +203,7 @@ class AnnotationCampaignCreateCheckAnnotationsSerializer(serializers.ModelSerial
             if detector_obj is None:
                 detector_obj = Detector.objects.get_or_create(name=detector_name)[0]
             if detector_config_id is None:
-                detector_obj.configurations.create(configuration=detector_config)
+                detector_obj.configurations.get_or_create(configuration=detector_config)
             detector_obj.save()
         print(">> Will create campaign")
 
@@ -228,9 +228,9 @@ class AnnotationCampaignCreateCheckAnnotationsSerializer(serializers.ModelSerial
         # Create results
         for result in validated_data["results"]:
             detector = Detector.objects.filter(name=result["detector"]).first()
-            detector_config = DetectorConfiguration.objects.get(
+            detector_config = DetectorConfiguration.objects.filter(
                 detector=detector, configuration=result["detector_config"]
-            )
+            ).first()
             dataset = Dataset.objects.get(name=result["dataset"])
             filename = result["dataset_file"]
             dataset_file = dataset.files.get(filename=filename)
