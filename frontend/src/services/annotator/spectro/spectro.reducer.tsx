@@ -7,6 +7,7 @@ import {
   SpectroCtxInitialValue, SpectrogramData, SpectrogramParams
 } from "./spectro.context.tsx";
 import { Retrieve } from "../../api/annotation-task-api.service.tsx";
+import { colormaps } from "./color.util.tsx";
 
 const baseUrlRegexp = /(.*\/)(.*)_\d*_\d*(\..*)/;
 
@@ -93,6 +94,7 @@ const spectroReducer: Reducer<SpectroCtx, SpectroCtxAction> = (currentContext: S
           overlap: currentSpectro.overlap,
           winsize: currentSpectro.winsize
         } : undefined,
+        availableColormaps: Object.keys(colormaps),
         currentZoom: 1,
         currentZoomOrigin: undefined
       }
@@ -104,6 +106,24 @@ const spectroReducer: Reducer<SpectroCtx, SpectroCtxAction> = (currentContext: S
         currentParams: action.params,
         currentZoomOrigin: undefined
       }
+
+    case 'updateBrightness':
+      return {
+        ...currentContext,
+        currentBrightness: action.brightness,
+      };
+    
+    case 'updateContrast':
+      return {
+        ...currentContext,
+        currentContrast: action.contrast,
+      };
+
+    case 'updateColormap':
+      return {
+        ...currentContext,
+        currentColormap: action.params,
+      };
 
     case 'zoom':
       zoom = getNewZoomLevel(action.direction);

@@ -16,6 +16,11 @@ export interface SpectrogramImage {
   image?: HTMLImageElement,
 }
 
+export interface SpectrogramColormap {
+  colormap: string;
+  invertColors: boolean;
+}
+
 export interface SpectrogramParams {
   nfft: number;
   winsize: number;
@@ -29,6 +34,12 @@ export interface SpectroCtx {
   currentParams?: SpectrogramParams;
   availableParams: Array<SpectrogramParams>
 
+  currentBrightness: number;
+  currentContrast: number;
+
+  currentColormap: SpectrogramColormap;
+  availableColormaps: Array<string>;
+
   availableZoomLevels: Array<number>;
   currentZoom: number;
   currentZoomOrigin?: { x: number, y: number };
@@ -41,11 +52,18 @@ export const SpectroCtxInitialValue: SpectroCtx = {
   availableZoomLevels: [],
   currentImages: [],
   availableParams: [],
+  currentBrightness: 100,
+  currentContrast: 100,
+  currentColormap: { colormap: 'none', invertColors: false },
+  availableColormaps: [],
   currentZoom: 1,
 }
 
 export type SpectroCtxAction =
   { type: 'init', task: Retrieve } |
+  { type: 'updateColormap', params: SpectrogramColormap } |
+  { type: 'updateBrightness', brightness: number } |
+  { type: 'updateContrast', contrast: number } |
   { type: 'updateParams', params: SpectrogramParams, zoom: number } |
   { type: 'updatePointerPosition', position: { time: number, frequency: number } } |
   { type: 'leavePointer' } |

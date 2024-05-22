@@ -155,28 +155,45 @@ html {
 .workbench-controls {
   position: absolute;
   top: 10px;
-  left: 100px;
+  left: 50px;
+  height: 40px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
+}
+.workbench-controls > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
   background-color: #ffffff;
-  border-radius: 5px;
+  padding: 10px;
+  &:first-child { border-radius: 5px 0 0 5px; }
+  &:last-child { border-radius: 0 5px 5px 0; }
 }
-.workbench-controls > * {
+.workbench-controls select {
   display: inline-block;
-  padding: 5px;
-}
-.workbench-controls > select {
   height: auto;
   width: auto;
-  margin-right: 20px;
 }
-.workbench-controls > button, .workbench-controls > span {
+.workbench-controls button, .workbench-controls span {
   font-size: 20px;
-  padding: 5px;
+}
+.workbench-controls label {
+  height: auto;
+  line-height: auto;
+  margin: 0;
+  padding-left: 30px;
+  font-size: 14px;
+  color: #000000;
 }
 
 .workbench-pointer {
   position: absolute;
   top: 10px;
-  left: 50%;
+  left: 78%;
   transform: translateX(-50%);
   background-color: #ffffff;
   border-radius: 5px;
@@ -187,7 +204,7 @@ html {
 .workbench-info {
   position: absolute;
   top: 10px;
-  right: 100px;
+  right: 50px;
   background-color: #ffffff;
   border-radius: 5px;
   padding: 5px 10px;
@@ -197,7 +214,6 @@ html {
 .workbench-info--intro{
   animation: workbench-info--intro 1s;
   box-shadow: 0 0 0 20em transparent;
-
 }
 
 @keyframes workbench-info--intro {

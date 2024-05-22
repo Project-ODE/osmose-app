@@ -39,7 +39,7 @@ describe('Whole file campaign creation', () => {
         it('spectro', () => {
             cy.contains(Cypress.env('wholeFileCampaign')).parentsUntil('tr').parent().contains('My tasks').click()
             cy.contains('Task link').click()
-            cy.get('select').should('have.text', 'nfft: 4096 / winsize: 4096 / overlap: 90')
+            cy.get('select:first').should('have.text', 'nfft: 4096 / winsize: 4096 / overlap: 90')
         })
 
         it('annotation set', () => {

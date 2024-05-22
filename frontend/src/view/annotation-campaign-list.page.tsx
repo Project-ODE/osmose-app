@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAnnotationCampaignAPI, AnnotationCampaignList as List } from "../services/api";
+import { colormaps, createColormap } from '../services/annotator/spectro/color.util';
 
 
 export const AnnotationCampaignList: React.FC = () => {
@@ -9,8 +10,32 @@ export const AnnotationCampaignList: React.FC = () => {
   const campaignService = useAnnotationCampaignAPI();
   const [error, setError] = useState<any | undefined>(undefined);
 
+  const colorRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
     let isCanceled = false;
+
+    // TEMP
+    const canvas = colorRef.current;
+    const context = canvas?.getContext('2d', {alpha: false});
+    if (context) {
+      context.fillStyle = 'rgba(255,255,255)';
+      context.fillRect(0, 0, 200, 2000);
+
+      let y0 = -20;
+
+      Object.keys(colormaps).forEach((name) => {
+        let x = 5;
+        y0 += 25;
+        const colormap = createColormap({colormap: colormaps[name], nshades: 128});
+        colormap.forEach((color) => {
+          context.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]})`;
+          context.fillRect(x,y0,1,20);
+          x++;
+        });
+      });
+    }
+    // END TEMP
 
     setError(undefined);
     campaignService.list().then(setAnnotationCampaigns).catch(e => {
@@ -89,6 +114,8 @@ export const AnnotationCampaignList: React.FC = () => {
           New annotation campaign
         </Link>
       </p>
+
+      <canvas ref={ colorRef } height={2000} width={200}></canvas>
     </div>
   )
 }
