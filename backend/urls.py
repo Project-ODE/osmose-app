@@ -26,20 +26,46 @@ https://www.django-rest-framework.org/api-guide/routers/
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
-
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-
 
 from backend.api.urls import api_router
 from backend.osmosewebsite.urls import website_router
+
+SchemaView = get_schema_view(
+    openapi.Info(
+        title="Snippets API",
+        default_version="v1",
+        description="Test description",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@snippets.local"),
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=[
+        permissions.IsAuthenticated,
+    ],
+)
 
 # Backend urls are for admin & api documentation
 backend_urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    path("schema", SpectacularAPIView.as_view(), name="schema"),
-    path("swagger", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger"),
+    path(
+        "doc/swagger<format>/",
+        SchemaView.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    path(
+        "doc/swagger/",
+        SchemaView.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path(
+        "doc/redoc/", SchemaView.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+    ),
 ]
 if settings.DEBUG:
     backend_urlpatterns += [path("__debug__/", include("debug_toolbar.urls"))]
