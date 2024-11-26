@@ -2,9 +2,11 @@ import React, { useImperativeHandle, useRef } from 'react';
 import { SpectrogramRender, SpectroRenderComponent } from "./spectro-render.component.tsx";
 import { AudioPlayer } from "./audio-player.component.tsx";
 import { useAppDispatch, useAppSelector } from "@/slices/app";
-import { selectSpectro, zoom } from "@/slices/annotator/spectro.ts";
+import { selectSpectro, updateBrightness, updateColormap, updateColormapInverted, updateContrast, zoom } from "@/slices/annotator/spectro.ts";
 import { RetrieveSpectroURL } from "@/services/api/annotation-task-api.service.tsx";
 import { PointerPosition } from "@/view/audio-annotator/components/bloc/pointer-position.component.tsx";
+import { COLORMAPS } from '@/services/utils/color.ts';
+import { Select } from '@/components/form/index.ts';
 
 // Component dimensions constants
 export const SPECTRO_CANVAS_HEIGHT: number = 512;
@@ -28,7 +30,11 @@ export const Workbench = React.forwardRef<SpectrogramRender, Props>(({ audioPlay
   } = useAppSelector(state => state.annotator.annotations);
   const {
     currentZoom,
-    selectedSpectroId
+    selectedSpectroId,
+    colormap,
+    colormapInverted,
+    brightness,
+    contrast
   } = useAppSelector(state => state.annotator.spectro);
   const dispatch = useAppDispatch()
 
@@ -56,23 +62,59 @@ export const Workbench = React.forwardRef<SpectrogramRender, Props>(({ audioPlay
   return (
     <div className="workbench rounded"
          style={ style.workbench }>
-      <p className="workbench-controls">
-        <select
-          defaultValue={ selectedSpectroId }
-          onChange={ e => dispatch(selectSpectro(+e.target.value)) }>
-          { task.spectroUrls.map(spectro => (
-            <option key={ spectro.id } value={ spectro.id }>
-              nfft: { spectro.nfft } | winsize: { spectro.winsize } | overlap: { spectro.overlap } | scale: { getScaleNameFor(spectro) }
-            </option>
-          ))
-          }
-        </select>
-        <button className="btn-simple fa fa-search-plus"
-                onClick={ () => dispatch(zoom({ direction: 'in' })) }></button>
-        <button className="btn-simple fa fa-search-minus"
-                onClick={ () => dispatch(zoom({ direction: 'out' })) }></button>
-        <span>{ currentZoom }x</span>
-      </p>
+      <div className="workbench-controls">
+
+        {/* Param selection */}
+        <div>
+          <select
+            defaultValue={ selectedSpectroId }
+            onChange={ e => dispatch(selectSpectro(+e.target.value)) }>
+            { task.spectroUrls.map(spectro => (
+              <option key={ spectro.id } value={ spectro.id }>
+                nfft: { spectro.nfft } | winsize: { spectro.winsize } | overlap: { spectro.overlap } | scale: { getScaleNameFor(spectro) }
+              </option>
+            ))
+            }
+          </select>
+        </div>
+
+        {/* Zoom selection */}
+        <div>
+          <button className="btn-simple fa fa-search-plus"
+                  onClick={ () => dispatch(zoom({ direction: 'in' })) }></button>
+          <button className="btn-simple fa fa-search-minus"
+                  onClick={ () => dispatch(zoom({ direction: 'out' })) }></button>
+          <span>{ currentZoom }x</span>
+        </div>
+
+        {/* Colormap selection */}
+        <div>
+          <Select required={ true }
+                  value={ colormap }
+                  placeholder="Select a colormap"
+                  onValueSelected={ (value) => dispatch(updateColormap(value as string)) }
+                  optionsContainer="popover"
+                  options={ Object.keys(COLORMAPS).map((cmap) => ({
+                    value: cmap, label: cmap, img: `/images/colormaps/${cmap}.png`
+                  })) }
+          />
+          <input
+            id="invertColors"
+            type="checkbox"
+            checked={ colormapInverted }
+            onChange={ e => dispatch(updateColormapInverted(e.target.checked)) }
+          />
+          <label htmlFor="invertColors">Inverted</label>
+          <input id="brightness" type="range" name="brightness" min="0" max="200" onChange={
+            e => dispatch(updateBrightness(e.target.valueAsNumber))
+          } />
+          <label htmlFor="brightness">{ brightness } %</label>
+          <input id="contrast" type="range" name="contrast" min="0" max="200" onChange={
+            e => dispatch(updateContrast(e.target.valueAsNumber))
+          } />
+          <label htmlFor="contrast">{ contrast } %</label>
+        </div>
+      </div>
 
       <PointerPosition/>
 

@@ -98,7 +98,7 @@ export const Select: React.FC<Props & Omit<HTMLProps<HTMLDivElement>, 'id' | 're
           onValueSelected(v.value === -1 ? undefined : v.value)
           setHasSelectedItem(true)
           setIsOpen(false)
-        } } key={ v.value }>{ v.label }</div>) }
+        } } key={ v.value }>{ v.img ? <img src={v.img} alt={v.label} /> : v.label }</div>) }
       </div> }
 
       { optionsContainer === 'alert' && <IonAlert

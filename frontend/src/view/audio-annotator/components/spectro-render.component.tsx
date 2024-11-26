@@ -20,6 +20,7 @@ import { YAxis } from "@/components/spectrogram/y-axis.component.tsx";
 import { XAxis } from "@/components/spectrogram/x-axis.component.tsx";
 import { setDangerToast } from "@/slices/annotator/global-annotator.ts";
 import { addResult } from "@/slices/annotator/annotations.ts";
+import { colorSpectro } from "@/services/utils/color.ts";
 
 export const SPECTRO_HEIGHT: number = 512;
 export const SPECTRO_WIDTH: number = 1813;
@@ -96,7 +97,11 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
   const {
     currentZoom,
     currentZoomOrigin,
-    selectedSpectroId
+    selectedSpectroId,
+    colormap,
+    colormapInverted,
+    brightness,
+    contrast
   } = useAppSelector(state => state.annotator.spectro);
   const dispatch = useAppDispatch()
 
@@ -144,7 +149,7 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
 
   useEffect(() => {
     loadSpectro()
-  }, [currentImages, canvasRef.current])
+  }, [currentImages, canvasRef.current, colormap, colormapInverted, brightness, contrast])
 
   const isInCanvas = (event: PointerEvent<HTMLDivElement> | MouseEvent) => {
     const bounds = canvasRef.current?.getBoundingClientRect();
@@ -318,6 +323,10 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
         canvas.height
       )
     }
+
+    // Color spectro images
+    colorSpectro(canvas, colormap, colormapInverted);
+    context.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
 
     // Progress bar
     if (withProgressBar) {

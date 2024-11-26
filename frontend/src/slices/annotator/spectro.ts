@@ -8,6 +8,11 @@ export type SpectroSlice = {
   selectedSpectroId: number;
   spectros: Array<RetrieveSpectroURL>;
 
+  colormap: string;
+  colormapInverted: boolean;
+  brightness: number;
+  contrast: number;
+
   currentZoom: number;
   currentZoomOrigin?: { x: number, y: number };
   maxZoom: number;
@@ -38,6 +43,10 @@ export const spectroSlice = createSlice({
   initialState: {
     selectedSpectroId: 0,
     spectros: [],
+    colormap: 'none',
+    colormapInverted: false,
+    brightness: 100,
+    contrast: 100,
     currentZoom: 1,
     maxZoom: 1,
   } as SpectroSlice,
@@ -81,6 +90,22 @@ export const spectroSlice = createSlice({
           break;
       }
     },
+
+    updateColormap: (state, action: { payload: string }) => {
+      state.colormap = action.payload;
+    },
+
+    updateColormapInverted: (state, action: { payload: boolean }) => {
+      state.colormapInverted = action.payload;
+    },
+
+    updateBrightness: (state, action: { payload: number }) => {
+      state.brightness = action.payload;
+    },
+
+    updateContrast: (state, action: { payload: number }) => {
+      state.contrast = action.payload;
+    },
   }
 })
 
@@ -89,7 +114,11 @@ export const {
   updatePointerPosition,
   leavePointer,
   zoom,
-  selectSpectro
+  selectSpectro,
+  updateColormap,
+  updateColormapInverted,
+  updateBrightness,
+  updateContrast,
 } = spectroSlice.actions;
 
 export default spectroSlice.reducer;
