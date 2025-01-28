@@ -36,7 +36,11 @@ export const AnnotatorSlice = createSlice({
     userPreferences: {
       audioSpeed: 1,
       zoomLevel: 1,
-      spectrogramConfigurationID: 1
+      spectrogramConfigurationID: 1,
+      colormap: 'none',
+      colormapInverted: false,
+      brightness: 100,
+      contrast: 100,
     },
     audio: {
       isPaused: true,
@@ -273,6 +277,18 @@ export const AnnotatorSlice = createSlice({
       state.userPreferences.spectrogramConfigurationID = payload;
       state.userPreferences.zoomLevel = 1;
     },
+    setColormap: (state, { payload }: { payload: string }) => {
+      state.userPreferences.colormap = payload;
+    },
+    invertColormap: (state) => {
+      state.userPreferences.colormapInverted = !state.userPreferences.colormapInverted;
+    },
+    setBrightness: (state, { payload }: { payload: number }) => {
+      state.userPreferences.brightness = payload;
+    },
+    setContrast: (state, { payload }: { payload: number }) => {
+      state.userPreferences.contrast = payload;
+    },
     setPointerPosition: (state, { payload }: { payload: { time: number, frequency: number } }) => {
       state.ui.pointerPosition = payload;
     },
@@ -403,6 +419,10 @@ export const {
   removeResult,
   addResult,
   selectSpectrogramConfiguration,
+  setColormap,
+  invertColormap,
+  setBrightness,
+  setContrast,
   setPointerPosition,
   zoom,
   leavePointerPosition,

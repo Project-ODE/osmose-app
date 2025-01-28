@@ -91,7 +91,14 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
 
   useEffect(() => {
     updateCanvas()
-  }, [ spectrogram_configurations, userPreferences.spectrogramConfigurationID ])
+  }, [
+    spectrogram_configurations,
+    userPreferences.spectrogramConfigurationID,
+    userPreferences.colormap,
+    userPreferences.colormapInverted,
+    userPreferences.brightness,
+    userPreferences.contrast,
+  ])
 
 
   // On zoom updated

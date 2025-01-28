@@ -6,6 +6,7 @@ import { useToast } from "@/service/ui";
 import { ScaleMapping } from '@/service/dataset/spectrogram-configuration/scale';
 import { getDuration } from "@/service/dataset";
 import { useAnnotator } from "@/service/annotator/hook.ts";
+import { colorSpectro } from "../utils/color";
 
 export const useSpectrogramService = (
   canvas: MutableRefObject<HTMLCanvasElement | null>,
@@ -95,6 +96,10 @@ export const useSpectrogramService = (
         canvas.current.height
       )
     }
+
+    // Color spectro images
+    colorSpectro(canvas.current, userPreferences.colormap, userPreferences.colormapInverted);
+    context.filter = `brightness(${userPreferences.brightness}%) contrast(${userPreferences.contrast}%)`;
   }
 
   function drawProgressBar() {

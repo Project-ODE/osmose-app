@@ -21,6 +21,8 @@ import { CampaignInstructionsButton } from "@/view/audio-annotator/components/bu
 import { SpectrogramDownloadButton } from "@/view/audio-annotator/components/buttons/spectrogram-download.tsx";
 import { ResultList } from "@/view/audio-annotator/components/bloc/result-list.component.tsx";
 import { SpectrogramConfigurationSelect } from "@/view/audio-annotator/components/select/spectrogram-configuration.tsx";
+import { ColormapConfiguration } from '@/view/audio-annotator/components/select/colormap-configuration.tsx';
+import { SpectrogramImage } from '@/view/audio-annotator/components/select/spectrogram-image.tsx';
 import { ZoomButton } from "@/view/audio-annotator/components/buttons/zoom.tsx";
 import { PointerPosition } from "@/view/audio-annotator/components/bloc/pointer-position.component.tsx";
 import { WorkbenchInfoBloc } from "@/view/audio-annotator/components/bloc/workbench-info.tsx";
@@ -134,10 +136,12 @@ export const AudioAnnotator: React.FC = () => {
              height: `${ CONTROLS_AREA_SIZE + SPECTRO_CANVAS_HEIGHT + TIME_AXIS_SIZE + SCROLLBAR_RESERVED }px`,
              width: `${ FREQ_AXIS_SIZE + SPECTRO_CANVAS_WIDTH }px`,
            } }>
-        <p className="workbench-controls">
+        <div className="workbench-controls">
           <SpectrogramConfigurationSelect/>
+          <ColormapConfiguration />
+          <SpectrogramImage />
           <ZoomButton/>
-        </p>
+        </div>
 
         <PointerPosition/>
 

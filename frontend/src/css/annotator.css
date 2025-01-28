@@ -46,6 +46,9 @@
     border-bottom-left-radius: 0 !important;
 }
 
+.inverted {
+    transform: rotate(180deg);
+}
 
 /* Generic elements */
 
@@ -114,31 +117,40 @@
 .workbench-controls {
     position: absolute;
     top: 10px;
-    left: 100px;
+    left: 50px;
     background-color: #ffffff;
     border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
 }
 
-.workbench-controls > * {
-    display: inline-block;
-    padding: 5px;
+.workbench-controls > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+}
+
+.workbench-controls input[type=number] {
+    width: 50px;
 }
 
 .workbench-controls > select {
     height: auto;
     width: auto;
-    margin-right: 20px;
 }
 
 .workbench-controls > button, .workbench-controls > span {
     font-size: 20px;
-    padding: 5px;
 }
 
 .workbench-pointer {
     position: absolute;
-    top: 10px;
-    left: 50%;
+    top: 20px;
+    right: 270px;
     transform: translateX(-50%);
     background-color: #ffffff;
     border-radius: 5px;
@@ -149,7 +161,7 @@
 .workbench-info {
     position: absolute;
     top: 10px;
-    right: 100px;
+    right: 50px;
     background-color: #ffffff;
     border-radius: 5px;
     padding: 5px 10px;
