@@ -1,0 +1,6 @@
+dataset,start_frequency,end_frequency,annotation,annotator,start_datetime,end_datetime,is_box,confidence_indicator_label,confidence_indicator_level
+Test Dataset,0,120.0,Rain,detector1,2012-10-03T11:00:00.000000+00:00,2012-10-03T11:15:00.000000+00:00,0,not confident,0/1
+Test Datasets,0,120.0,Whistle,detector2,2012-10-03T11:00:00.000000+00:00,2012-10-03T12:15:00.000000+00:00,0,confident,1/2
+Test dataset,2000,8000,Whistle,detector2,2012-10-03T11:00:00.000000+00:00,2012-10-03T11:15:00.000000+00:00,1,confident,1/1
+Test Dataset,300,7000,Rain,detector3,2012-10-03T11:00:00.000000+00:00,2012-10-03T12:15:00.000000+00:00,1,not confident,0/1
+Test Dataset,0,120,Rain,detector3,2012-10-03T11:20:00.000000+00:00,2012-10-03T11:30:00.000000+00:00,0,not confident,0/1

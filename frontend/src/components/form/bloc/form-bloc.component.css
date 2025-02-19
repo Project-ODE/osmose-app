@@ -1,21 +1,22 @@
 #form-bloc {
-  display: grid;
-  gap: 1rem;
+    display: grid;
+    gap: 0.75rem;
 }
 
 #form-bloc > ion-spinner {
-  justify-self: center;
+    justify-self: center;
 }
 
 #form-bloc #separator {
-  font-weight: 300;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 1rem;
-  padding: 0 2rem;
-  align-items: center;
+    font-weight: 300;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    padding: 0 2rem;
+    align-items: center;
 }
+
 #form-bloc #separator > div {
-  height: 1px;
-  border-bottom: 1px solid var(--ion-color-medium);
+    height: 1px;
+    border-bottom: 1px solid var(--ion-color-medium);
 }

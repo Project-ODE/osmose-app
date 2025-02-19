@@ -1,28 +1,32 @@
-import { MutableRefObject, useMemo, useRef } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 import { useAppSelector } from '@/service/app';
 import { buildErrorMessage } from "@/services/utils/format.tsx";
-import { getFileDuration } from '@/service/dataset';
 import { AnnotationResultBounds } from '@/service/campaign/result';
-import { useToast } from '@/services/utils/toast.ts';
+import { useToast } from "@/service/ui";
 import { ScaleMapping } from '@/service/dataset/spectrogram-configuration/scale';
+import { getDuration } from "@/service/dataset";
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 export const useSpectrogramService = (
   canvas: MutableRefObject<HTMLCanvasElement | null>,
   xAxis: MutableRefObject<ScaleMapping | null>,
   yAxis: MutableRefObject<ScaleMapping | null>,
 ) => {
+  const { annotatorData } = useAnnotator()
 
   const {
     audio,
-    file,
-    spectrogram_configurations,
     userPreferences,
   } = useAppSelector(state => state.annotator);
   const toast = useToast();
 
-  const duration = useMemo(() => getFileDuration(file), [ file ]);
+  const duration = useMemo(() => getDuration(annotatorData?.file), [ annotatorData?.file ]);
 
   const images = useRef<Map<number, Array<HTMLImageElement | undefined>>>(new Map);
+
+  useEffect(() => {
+    images.current = new Map()
+  }, [userPreferences.spectrogramConfigurationID]);
 
   function areAllImagesLoaded(): boolean {
     const currentImages = images.current.get(userPreferences.zoomLevel);
@@ -30,15 +34,15 @@ export const useSpectrogramService = (
   }
 
   async function loadImages() {
-    const currentConfiguration = spectrogram_configurations?.find(c => c.id === userPreferences.spectrogramConfigurationID);
-    if (!currentConfiguration || !file) {
+    const currentConfiguration = annotatorData?.spectrogram_configurations.find(c => c.id === userPreferences.spectrogramConfigurationID);
+    if (!currentConfiguration || !annotatorData) {
       images.current = new Map();
       return;
     }
 
     if (areAllImagesLoaded()) return;
 
-    const filename = file.filename.split('.')[0]
+    const filename = annotatorData.file.filename.split('.')[0]
     return Promise.all(
       Array.from(new Array<HTMLImageElement | undefined>(userPreferences.zoomLevel)).map(async (_, index) => {
         console.info(`Will load for zoom ${ userPreferences.zoomLevel }, image ${ index }`)

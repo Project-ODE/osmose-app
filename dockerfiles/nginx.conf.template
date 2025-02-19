@@ -8,12 +8,38 @@ server {
   server_name osmose;
   client_max_body_size 10M;
 
+  gzip on;
+  gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
   location /app {
     root /usr/share/nginx/;
     proxy_intercept_errors on;
     error_page 404 = /app/index.html;
     proxy_no_cache 1;
     client_max_body_size 10M;
+  }
+
+  location /doc {
+    # content location
+    rewrite ^/doc/(.*) /$1 break;
+    root /usr/share/nginx/doc;
+    index /doc/index.html
+
+    # exact matches -> reverse clean urls -> folders -> not found
+    try_files $uri $uri.html $uri/ =404;
+
+    # non existent pages
+    error_page 404 /doc/404.html;
+
+    # a folder without index.html raises 403 in this setup
+    error_page 403 /doc/404.html;
+
+    # adjust caching headers
+    # files in the assets folder have hashes filenames
+    location ~* ^/assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
   }
 
   location / {

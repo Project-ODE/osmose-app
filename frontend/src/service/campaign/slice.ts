@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { CampaignAPI } from './api.ts';
 import {
   CampaignState,
-  CannotFormatCSVError, DetectorSelection,
+  CannotFormatCSVError,
+  DetectorSelection,
   FileData,
   UnreadableFileError,
   UnsupportedCSVError,
@@ -10,7 +11,7 @@ import {
   WrongMIMETypeError
 } from './type';
 import { Errors } from '@/service/type.ts';
-import { WriteAnnotationFileRange } from '@/service/campaign/annotation-file-range';
+import { AnnotationFileRange, WriteAnnotationFileRange } from '@/service/campaign/annotation-file-range';
 import { getNewItemID } from '@/service/function.ts';
 import { AnnotationResultAPI } from '@/service/campaign/result';
 import { ACCEPT_CSV_MIME_TYPE, ACCEPT_CSV_SEPARATOR, IMPORT_ANNOTATIONS_COLUMNS } from '@/consts/csv.ts';
@@ -59,6 +60,7 @@ export const loadFile = createAsyncThunk(
             type: file.type,
             datasets, detectorsForDatasets,
             detectors: getDetectors(data),
+            labels: [ ...new Set(data.map(d => d.annotation)) ].sort()
           })
         } catch (e) {
           reject(e)
@@ -67,6 +69,19 @@ export const loadFile = createAsyncThunk(
     })
   }
 )
+
+function _addDraftFileRange(state: CampaignState, { payload }: {
+  payload: Partial<WriteAnnotationFileRange> & { annotator: number }
+}) {
+  if (state.draftFileRanges.find(r => r.id === payload.id)) {
+    state.draftFileRanges = state.draftFileRanges.map(r => r.id === payload.id ? { ...payload, id: r.id } : r)
+  } else {
+    state.draftFileRanges.push({
+      ...payload,
+      id: payload.id ?? getNewItemID(state.draftFileRanges)
+    });
+  }
+}
 
 export const CampaignSlice = createSlice({
   name: 'campaign',
@@ -101,11 +116,17 @@ export const CampaignSlice = createSlice({
       }
     },
 
-    addDraftFileRange: (state, { payload }: { payload: Partial<WriteAnnotationFileRange> & { annotator: number } }) => {
-      state.draftFileRanges.push({
-        ...payload,
-        id: payload.id ?? getNewItemID(state.draftFileRanges)
-      });
+    addDraftFileRange: _addDraftFileRange,
+    loadDraftFileRange: (state, { payload }: { payload: AnnotationFileRange[] }) => {
+      for (const range of payload) {
+        _addDraftFileRange(state, {
+          payload: {
+            ...range,
+            first_file_index: range.first_file_index + 1,
+            last_file_index: range.last_file_index + 1,
+          }
+        })
+      }
     },
     updateDraftFileRange: (state, { payload }: { payload: Partial<WriteAnnotationFileRange> & { id: number } }) => {
       state.draftFileRanges = state.draftFileRanges.map(r => {
@@ -191,6 +212,7 @@ export const {
   updateSubmissionErrors: updateCampaignSubmissionErrors,
   removeDraftFileRange,
   addDraftFileRange,
+  loadDraftFileRange,
   updateDraftFileRange,
   clearImport,
   setFilteredDatasets,

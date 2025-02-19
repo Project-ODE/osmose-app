@@ -5,12 +5,17 @@ import { DEFAULT_COLOR } from "@/consts/colors.const.tsx";
 import Tooltip from "react-bootstrap/Tooltip";
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import { focusLabel, getPresenceLabels } from '@/service/annotator';
+import { IonChip, IonIcon } from '@ionic/react';
+import { checkmarkOutline } from 'ionicons/icons';
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 
 export const LabelListBloc: React.FC = () => {
-
   const {
     label_set,
+  } = useAnnotator();
+
+  const {
     results,
     focusedLabel
   } = useAppSelector(state => state.annotator);
@@ -54,28 +59,27 @@ const LabelItem: React.FC<ItemProps> = ({
   const color = labelColors[label] ?? DEFAULT_COLOR;
   const style = {
     inactive: {
-      backgroundColor: color,
-      border: 'none',
-      color: '#ffffff',
+      '--background': '#f6f6f6',
+      '--color': color,
+    },
+    disabled: {
+      '--background': 'transparent',
+      '--color': '#aaa',
     },
     active: {
-      backgroundColor: 'transparent',
-      border: `1px solid ${ color }`,
-      color: color,
+      '--background': color,
+      '--color': 'white',
     },
   };
 
   return (
     <OverlayTrigger overlay={ <Tooltip hidden={ !isEnabled }><TooltipComponent id={ id }/></Tooltip> } placement="top">
-      <li>
-        <button className={ isEnabled ? `btn pulse__${ id }--active` : 'btn' }
-                style={ isActive ? style.active : (isEnabled ? style.inactive : {}) }
-                onClick={ () => dispatch(focusLabel(label)) }
-                type="button"
-                disabled={ !isEnabled }>
-          { label }
-        </button>
-      </li>
+      <IonChip style={ isActive ? style.active : isEnabled ? style.inactive : style.disabled }
+               onClick={ () => dispatch(focusLabel(label)) }
+               disabled={ !isEnabled }>
+        { label }
+        { isActive && <IonIcon src={ checkmarkOutline } color="light"/> }
+      </IonChip>
     </OverlayTrigger>
   )
 }

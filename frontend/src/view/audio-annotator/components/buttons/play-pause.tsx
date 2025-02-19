@@ -14,6 +14,7 @@ export const PlayPauseButton: React.FC<{ player: MutableRefObject<HTMLAudioEleme
   const audioService = useAudioService(player)
 
   return <OverlayTrigger
+    placement='bottom'
     overlay={ <Tooltip><NavigationShortcutOverlay shortcut="Space" description="Play/Pause audio"/></Tooltip> }>
     <IonButton color={ "primary" }
                shape={ "round" }

@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { IonBadge, IonButton, IonIcon, IonProgressBar } from '@ionic/react';
+import { IonBadge, IonIcon } from '@ionic/react';
 import { crop } from "ionicons/icons";
 import { AnnotationCampaign } from '@/service/campaign';
+import { Progress } from "@/components/ui/Progress.tsx";
 import './campaign-card.component.css';
 
 interface Props {
@@ -37,11 +38,11 @@ export const CampaignCard: React.FC<Props> = ({ campaign }) => {
     }
   }, [ state ]);
 
-  const manage = () => history.push(`/annotation-campaign/${ campaign.id }`);
-  const annotate = () => history.push(`/annotation-campaign/${ campaign.id }/file`);
+  const accessDetail = () => history.push(`/annotation-campaign/${ campaign.id }`);
+  const accessAuxDetail = () => window.open(`/app/annotation-campaign/${ campaign.id }`, '_blank');
 
   return (
-    <div className="campaign-card">
+    <div className="campaign-card" onClick={ accessDetail } onAuxClick={ accessAuxDetail }>
 
       <div id="head">
         { state === State.open && <IonBadge color="secondary">Open</IonBadge> }
@@ -59,34 +60,13 @@ export const CampaignCard: React.FC<Props> = ({ campaign }) => {
         <p>{ campaign.usage }</p>
       </div>
 
-      { campaign.my_total > 0 && <div className="my progression">
-          <p>
-          <span className="progress-label">
-            My progress:
-          </span> <span className={ "progress-value ion-color-" + color }>
-            { campaign.my_progress }&nbsp;/&nbsp;{ campaign.my_total }
-          </span>
-          </p>
-          <IonProgressBar color={ color }
-                          value={ campaign.my_progress / campaign.my_total }/>
-      </div> }
-      { campaign.total > 0 && <div className="progression">
-          <p>
-          <span className="progress-label">
-            Campaign progress: { campaign.progress }&nbsp;/&nbsp;{ campaign.total }
-          </span>
-          </p>
-          <IonProgressBar color="medium"
-                          value={ campaign.progress / campaign.total }/>
-      </div> }
+      { campaign.my_total > 0 ? <Progress label='My progress' color={ color }
+                                          value={ campaign.my_progress }
+                                          total={ campaign.my_total }/> : <div/> }
 
-      <div id="buttons" className={ campaign.my_total > 0 ? '' : 'fill' }>
-        <IonButton fill="outline" onClick={ manage }>
-          { campaign.archive ? "Info" : "Manage" }
-        </IonButton>
-        { !campaign.archive && campaign.my_total > 0 &&
-            <IonButton fill="solid" onClick={ annotate }>Annotate</IonButton> }
-      </div>
+      { campaign.total > 0 && <Progress label='Global progress'
+                                        value={ campaign.progress }
+                                        total={ campaign.total }/> }
     </div>
   );
 }

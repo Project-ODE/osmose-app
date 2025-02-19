@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import QuerySet, Q, Subquery, Exists, OuterRef
 
+from .campaign import AnnotationCampaign
 from ..datasets import DatasetFile
 
 
@@ -28,7 +29,7 @@ class AnnotationTask(models.Model):
     status = models.TextField(choices=Status.choices, default=Status.CREATED)
 
     annotation_campaign = models.ForeignKey(
-        "AnnotationCampaign", on_delete=models.CASCADE, related_name="tasks"
+        AnnotationCampaign, on_delete=models.CASCADE, related_name="tasks"
     )
     annotator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -66,7 +67,7 @@ class AnnotationFileRange(models.Model):
         related_name="annotation_file_ranges",
     )
     annotation_campaign = models.ForeignKey(
-        "AnnotationCampaign",
+        AnnotationCampaign,
         on_delete=models.CASCADE,
         related_name="annotation_file_ranges",
     )
@@ -215,3 +216,22 @@ class AnnotationFileRange(models.Model):
                 return_ids.append(instance.id)
                 connected_ranges.exclude(id=instance.id).delete()
         return AnnotationFileRange.objects.filter(id__in=return_ids)
+
+
+class AnnotationSession(models.Model):
+    """
+    This table contains the AudioAnnotator sessions output linked to the annotation of a specific dataset file. There
+    can be multiple AA sessions for an annotation_tasks, the result of the latest session should be equal to the
+    dataset’s file annotation.
+    """
+
+    class Meta:
+        db_table = "annotation_sessions"
+
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    session_output = models.JSONField()
+
+    annotation_task = models.ForeignKey(
+        AnnotationTask, on_delete=models.CASCADE, related_name="sessions"
+    )

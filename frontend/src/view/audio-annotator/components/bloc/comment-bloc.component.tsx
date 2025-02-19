@@ -1,12 +1,7 @@
 import React, { useMemo } from "react";
 import { useAppDispatch, useAppSelector } from '@/service/app';
-import {
-  disableShortcuts,
-  enableShortcuts,
-  focusTask,
-  removeFocusComment,
-  updateFocusComment
-} from '@/service/annotator';
+import { focusTask, removeFocusComment, updateFocusComment } from '@/service/annotator';
+import { disableShortcuts, enableShortcuts } from "@/service/events";
 
 
 export const CommentBloc: React.FC = () => {

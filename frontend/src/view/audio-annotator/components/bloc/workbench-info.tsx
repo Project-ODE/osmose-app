@@ -1,11 +1,13 @@
 import React, { Fragment, useMemo } from "react";
 import { useAppSelector } from '@/service/app';
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 export const WorkbenchInfoBloc: React.FC = () => {
   const {
     campaign,
-    file
-  } = useAppSelector(state => state.annotator);
+  } = useAnnotator();
+
+  const file = useAppSelector(state => state.annotator.file);
 
   const filename = useMemo(() => {
     if (!file) return '';

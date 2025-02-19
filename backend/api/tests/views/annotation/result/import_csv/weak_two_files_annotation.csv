@@ -1,2 +1,2 @@
-dataset,filename,start_time,end_time,start_frequency,end_frequency,annotation,annotator,start_datetime,end_datetime,is_box,confidence_indicator_label,confidence_indicator_level
-Dataset,sound001.wav,0,0,0,64000,click,detector1,2012-10-03T10:00:00+00:00,2012-10-03T11:10:00+00:00,0,sure,1/1
+dataset,start_frequency,end_frequency,annotation,annotator,start_datetime,end_datetime,is_box,confidence_indicator_label,confidence_indicator_level
+Dataset,0,64000,click,detector1,2012-10-03T10:00:00+00:00,2012-10-03T11:10:00+00:00,0,sure,1/1

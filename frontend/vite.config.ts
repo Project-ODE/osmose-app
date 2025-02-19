@@ -18,6 +18,7 @@ export default (_: ConfigEnv): UserConfig => {
       proxy: {
         "/api": "http://localhost:8000",
         "/backend": "http://localhost:8000",
+        "/doc": "http://localhost:5174",
       },
       cors: false
     },
