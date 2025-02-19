@@ -32,6 +32,7 @@ from backend.utils.serializers import (
 )
 from .comment import AnnotationCommentSerializer
 from .confidence_indicator_set import ConfidenceIndicatorSerializer
+from ...models.annotation.result import AnnotationResultType
 
 
 def to_seconds(delta: timedelta) -> float:
@@ -355,6 +356,7 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
     acoustic_features = AnnotationResultAcousticFeaturesSerializer(
         allow_null=True, required=False
     )
+    type = EnumField(enum=AnnotationResultType, read_only=True)
 
     class Meta:
         model = AnnotationResult
