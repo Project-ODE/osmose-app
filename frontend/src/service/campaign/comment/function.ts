@@ -1,8 +1,8 @@
 import { AnnotationComment, WriteAnnotationComment } from '@/service/campaign/comment/type.ts';
 
-export function mapCommentForWriting(comment: AnnotationComment): WriteAnnotationComment {
-  return {
-    id: comment.id > -1 ? comment.id : undefined,
-    comment: comment.comment
-  }
+export function transformCommentsForWriting(comments: AnnotationComment[]): WriteAnnotationComment[] {
+  return comments.filter(c => c.comment.trim().length > 0).map(c => ({
+    id: c.id > -1 ? c.id : undefined,
+    comment: c.comment.trim()
+  }))
 }

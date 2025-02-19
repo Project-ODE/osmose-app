@@ -33,7 +33,7 @@ export interface SpectrogramConfiguration {
   time_resolution_zoom_6: number;
   time_resolution_zoom_7: number;
   time_resolution_zoom_8: number;
-  window_type: WindowType;
+  window_type: WindowType | null;
   linear_frequency_scale: LinearScale | null;
   multi_linear_frequency_scale: MultiLinearScale | null;
 }

@@ -1,0 +1,13 @@
+.selectAlert {
+  grid-template-rows: auto auto 1fr auto;
+  align-items: start;
+  height: 80%;
+
+  .radioGroup {
+    overflow-y: auto;
+    height: 100%;
+    justify-items: start;
+    align-content: start;
+    gap: 1rem;
+  }
+}

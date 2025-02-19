@@ -93,7 +93,7 @@ class RetrieveFilledBaseUserAuthenticatedTestCase(AuthenticatedTestCase):
         self.assertEqual(len(response.data["datasets"]), 1)
         self.assertEqual(response.data["owner"], "user1")
         self.assertEqual(response.data["my_progress"], 0)
-        self.assertEqual(response.data["my_total"], 5)
+        self.assertEqual(response.data["my_total"], 4)
 
     def test_retrieve_archived(self):
         response = self.client.get(URL_archived)

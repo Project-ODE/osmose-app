@@ -40,7 +40,7 @@
     last_file_index: 9
     first_file_id: 7
     last_file_id: 10
-    files_count: 5
+    files_count: 4
     annotator: 4
     annotation_campaign: 1
 - model: api.annotationfilerange

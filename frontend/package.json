@@ -1,7 +1,7 @@
 {
   "name": "aplose-frontend",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0-1",
   "type": "module",
   "homepage": ".",
   "proxy": "http://localhost:8000",
@@ -15,7 +15,10 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "jest",
-    "test:playwright": "concurrently --kill-others -s=first \"npm run run:all\" \"npm run wait:server && npx playwright test -c ./playwright.config.ts ./tests/front\""
+    "test:playwright": "concurrently --kill-others -s=first \"npm run run:all\" \"npm run wait:server && npx playwright test -c ./playwright.config.ts ./tests/front\"",
+    "docs:dev": "vitepress dev docs --base \"/doc/\"",
+    "docs:build": "vitepress build docs --base \"/doc/\"",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@ionic/react": "^7.6.2",
@@ -29,6 +32,7 @@
     "react-router-dom": "^5.3.4",
     "rxjs": "^7.8.1",
     "sass": "^1.77.8",
+    "signal-ts": "^1.2.4",
     "superagent": "^8.1.2",
     "uuid": "^9.0.1"
   },
@@ -66,6 +70,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
+    "vitepress": "^1.5.0",
     "wait-on": "^8.0.1"
   }
 }

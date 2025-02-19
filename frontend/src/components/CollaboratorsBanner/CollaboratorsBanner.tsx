@@ -1,6 +1,6 @@
 import React from "react";
-import { Collaborator } from "../../interface/collaborator";
 import './CollaboratorsBanner.css';
+import { Collaborator } from "@/service/collaborator";
 
 interface CollaboratorsBannerProps {
     collaborators?: Array<Collaborator>

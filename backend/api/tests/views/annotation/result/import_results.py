@@ -136,14 +136,16 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
     ):
         result_1 = results.first()
         self.__check_global_result(response[0])
+        # First annotation cover all file -> weak
         self.assertEqual(response[0]["id"], result_1.id)
         self.assertEqual(response[0]["annotation_campaign"], campaign_id)
         self.assertEqual(response[0]["dataset_file"], 1)
-        self.assertEqual(response[0]["start_time"], 0)
-        self.assertEqual(response[0]["end_time"], 15 * 60)
-        self.assertEqual(response[0]["start_frequency"], 0)
-        self.assertEqual(response[0]["end_frequency"], 64_000)
+        self.assertEqual(response[0]["start_time"], None)
+        self.assertEqual(response[0]["end_time"], None)
+        self.assertEqual(response[0]["start_frequency"], None)
+        self.assertEqual(response[0]["end_frequency"], None)
         result_2 = results.exclude(id=result_1.id).first()
+        # Second annotation doesn't cover all file -> strong
         self.__check_global_result(response[1])
         self.assertEqual(response[1]["id"], result_2.id)
         self.assertEqual(response[1]["annotation_campaign"], campaign_id)

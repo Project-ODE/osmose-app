@@ -1,8 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getAuthenticatedBaseQuery } from '@/service/auth/function.ts';
-import { ID } from '@/service/type.ts';
-import { AnnotationFileRange, AnnotationFileRangeWithFiles, WriteAnnotationFileRange } from './type.ts';
+import { ID, Paginated } from '@/service/type.ts';
+import { AnnotationFile, AnnotationFileRange, WriteAnnotationFileRange } from './type.ts';
 import { encodeQueryParams } from '@/service/function.ts';
+import { FileFilters } from "@/service/ui/type.ts";
+
+export const FILES_PAGE_SIZE = 20;
 
 export const AnnotationFileRangeAPI = createApi({
   reducerPath: 'fileRangeApi',
@@ -20,15 +23,16 @@ export const AnnotationFileRangeAPI = createApi({
         return encodeQueryParams(params);
       },
     }),
-    listWithFiles: builder.query<Array<AnnotationFileRangeWithFiles>, {
-      campaignID?: ID,
-      forCurrentUser?: boolean,
-    }>({
-      query: ({ campaignID, forCurrentUser }) => {
-        const params: any = { with_files: true }
-        if (campaignID) params.annotation_campaign = campaignID;
-        if (forCurrentUser) params.for_current_user = true;
-        return encodeQueryParams(params);
+    listFilesWithPagination: builder.query<Paginated<AnnotationFile> & { resume?: number }, {
+      page: number,
+    } & FileFilters>({
+      query: ({ campaignID, page, search, withUserAnnotations, isSubmitted, label }) => {
+        const params: any = { page, page_size: FILES_PAGE_SIZE }
+        if (search) params['search'] = search;
+        if (withUserAnnotations !== undefined) params['with_user_annotations'] = withUserAnnotations;
+        if (isSubmitted !== undefined) params['is_submitted'] = isSubmitted;
+        if (label !== undefined) params['label'] = label;
+        return `campaign/${ campaignID }/files/${ encodeQueryParams(params) }`;
       },
     }),
 
@@ -44,6 +48,6 @@ export const AnnotationFileRangeAPI = createApi({
 
 export const {
   useListQuery: useListAnnotationFileRangeQuery,
-  useListWithFilesQuery: useListAnnotationFileRangeWithFilesQuery,
+  useListFilesWithPaginationQuery,
   usePostMutation: usePostAnnotationFileRangeMutation,
 } = AnnotationFileRangeAPI;

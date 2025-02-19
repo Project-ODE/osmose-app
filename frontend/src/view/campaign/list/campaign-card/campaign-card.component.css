@@ -13,6 +13,11 @@
                         "progression"
                         "buttons";
   grid-template-rows: auto auto 1fr auto auto;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: var(--aplose-box-shadow);
+  }
 }
 
 .campaign-card #head {
@@ -79,17 +84,4 @@
 
 .campaign-card .progression .progress-value {
   color: var(--ion-color-shade);
-}
-
-
-.campaign-card #buttons {
-  display: grid;
-  justify-content: space-between;
-  grid-auto-flow: column;
-  margin-top: 0.5rem;
-  grid-area: buttons;
-}
-
-.campaign-card #buttons.fill {
-  justify-content: stretch;
 }

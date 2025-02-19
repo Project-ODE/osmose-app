@@ -45,7 +45,7 @@ function downloadFile(filename: string, type: string, text: string) {
 export async function downloadResponseHandler(response: Response) {
   // TODO: reject errors correctly (catchable) - like a standard API error
   if (response.status !== 200) return `[${ response.status }] ${ response.statusText }`;
-  const filenameRegExp = /filename=([a-zA-Z_.]*)/.exec(response.url)
+  const filenameRegExp = /filename=([a-zA-Z_1-9.]*)/.exec(response.url)
   if (!filenameRegExp || filenameRegExp.length < 2) throw new Error("No filename provided");
   const filename = filenameRegExp[1];
   const type = response.headers.get('content-type')

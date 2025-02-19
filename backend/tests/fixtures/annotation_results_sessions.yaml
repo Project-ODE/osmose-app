@@ -79,8 +79,8 @@
 - model: api.annotationresult
   pk: 7
   fields:
-    start_time: 108.21842250413678
-    end_time: 224.87589630446772
+    start_time: 108.2
+    end_time: 224.8
     start_frequency: 7520.0
     end_frequency: 13696.0
     label: 2
@@ -118,8 +118,8 @@
 - model: api.annotationresult
   pk: 10
   fields:
-    start_time: 108.21842250413678
-    end_time: 224.87589630446772
+    start_time: 108.2
+    end_time: 224.8
     start_frequency: 7520.0
     end_frequency: 13696.0
     label: 4
@@ -196,8 +196,8 @@
     end: 2022-01-24 15:12:43+00:00
     session_output:
       annotations:
-      - end_time: 224.87589630446772
-        start_time: 108.21842250413678
+      - end_time: 224.8
+        start_time: 108.2
         end_frequency: 13696.0
         start_frequency: 7520.0
         label_id: 2

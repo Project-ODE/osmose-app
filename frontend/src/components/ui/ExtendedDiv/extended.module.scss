@@ -1,0 +1,102 @@
+$border-size: 2px;
+$handle-long: 100%;
+$handle-thick: 0.75rem;
+
+.resizable {
+  $border-size: 2px;
+  $handle-long: 100%;
+  $handle-thick: 0.75rem;
+  position: absolute;
+  border: $border-size solid var(--ion-color-base, var(--ion-color-dark));
+  pointer-events: none;
+
+  .inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.draggable {
+  cursor: move;
+  pointer-events: all;
+}
+
+.fill {
+  height: 100%;
+  width: 100%;
+}
+
+.top, .left, .right, .bottom,
+.topLeft, .topRight, .bottomLeft, .bottomRight {
+  position: absolute;
+}
+
+.topLeft, .topRight, .bottomLeft, .bottomRight {
+  height: $handle-thick;
+  width: $handle-thick;
+}
+
+.top, .bottom {
+  cursor: ns-resize;
+  height: $handle-thick;
+  width: $handle-long;
+}
+
+.left, .right {
+  cursor: ew-resize;
+  width: $handle-thick;
+  height: $handle-long;
+}
+
+.top {
+  top: calc(-1 * $border-size / 2);
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.bottom {
+  bottom: calc(-1 * $border-size / 2);
+  left: 50%;
+  transform: translate(-50%, +50%);
+}
+
+.left {
+  left: calc(-1 * $border-size / 2);
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.right {
+  right: calc(-1 * $border-size / 2);
+  top: 50%;
+  transform: translate(+50%, -50%);
+}
+
+.topLeft {
+  cursor: nwse-resize;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.topRight {
+  cursor: nesw-resize;
+  top: 0;
+  right: 0;
+  transform: translate(+50%, -50%);
+}
+
+.bottomLeft {
+  cursor: nesw-resize;
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, +50%);
+}
+
+.bottomRight {
+  cursor: nwse-resize;
+  bottom: 0;
+  right: 0;
+  transform: translate(+50%, +50%);
+}

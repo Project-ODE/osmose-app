@@ -13,15 +13,21 @@ import { AudioMetadataAPI } from '@/service/dataset/audio-metatada';
 import { DetectorAPI } from '@/service/campaign/detector';
 import { AnnotatorAPI, AnnotatorSlice } from '@/service/annotator';
 import { AnnotationResultAPI } from '@/service/campaign/result';
+import { CollaboratorAPI } from "@/service/collaborator";
+import { EventSlice } from "@/service/events";
+import { UISlice } from "@/service/ui";
 
 export const AppStore = configureStore({
   reducer: {
+    [UISlice.reducerPath]: UISlice.reducer,
+    [EventSlice.reducerPath]: EventSlice.reducer,
     [AuthSlice.reducerPath]: AuthSlice.reducer,
     [CampaignSlice.reducerPath]: CampaignSlice.reducer,
     [AnnotatorSlice.reducerPath]: AnnotatorSlice.reducer,
 
     [AuthAPI.reducerPath]: AuthAPI.reducer,
     [UserAPI.reducerPath]: UserAPI.reducer,
+    [CollaboratorAPI.reducerPath]: CollaboratorAPI.reducer,
     [CampaignAPI.reducerPath]: CampaignAPI.reducer,
     [AnnotationFileRangeAPI.reducerPath]: AnnotationFileRangeAPI.reducer,
     [DatasetAPI.reducerPath]: DatasetAPI.reducer,
@@ -38,6 +44,7 @@ export const AppStore = configureStore({
     getDefaultMiddleware()
       .concat(AuthAPI.middleware)
       .concat(UserAPI.middleware)
+      .concat(CollaboratorAPI.middleware)
       .concat(CampaignAPI.middleware)
       .concat(AnnotationFileRangeAPI.middleware)
       .concat(DatasetAPI.middleware)
