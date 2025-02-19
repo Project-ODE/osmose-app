@@ -166,6 +166,15 @@ class AnnotationResult(models.Model):
         help_text="Acoustic features add a better description to the signal",
     )
 
+    def save(self, *args, **kwargs):
+        if self.start_time is None:
+            self.type = AnnotationResultType.WEAK
+        elif self.end_time is None:
+            self.type = AnnotationResultType.POINT
+        else:
+            self.type = AnnotationResultType.BOX
+        super().save(*args, **kwargs)
+
 
 class AnnotationResultValidation(models.Model):
     """
