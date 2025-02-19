@@ -247,7 +247,11 @@ class UpdateTestCase(CreateTestCase):
         serializer.save()
         self.assertDictEqual(
             dict(serializer.data),
-            {"id": self.instance.id, **self._get_response_result(presence_result)},
+            {
+                "id": self.instance.id,
+                "type": "Weak",
+                **self._get_response_result(presence_result),
+            },
         )
 
     def test_box(self):
@@ -258,6 +262,7 @@ class UpdateTestCase(CreateTestCase):
             dict(serializer.data),
             {
                 "id": self.instance.id,
+                "type": "Box",
                 **self._get_response_result(box_result),
             },
         )
@@ -280,6 +285,7 @@ class UpdateTestCase(CreateTestCase):
             {
                 **self._get_response_result(presence_result),
                 "id": self.instance.id,
+                "type": "Box",
                 "start_time": 7 * 60.0,
                 "end_time": 9 * 60.0,
                 "start_frequency": 7_000.0,

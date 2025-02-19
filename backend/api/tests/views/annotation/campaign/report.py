@@ -26,7 +26,7 @@ def check_report(test: APITestCase, response: Response):
     test.assertEqual(data[0], REPORT_HEADERS)
     # annotationresult id=7 ; because ordered by dataset_file__start and not id
     test.assertEqual(
-        data[1][:15],
+        data[1][:16],
         [
             "SPM Aural A 2010",
             "sound001.wav",
@@ -40,6 +40,7 @@ def check_report(test: APITestCase, response: Response):
             "2012-10-03T10:01:48.200+00:00",
             "2012-10-03T10:03:44.800+00:00",
             "1",
+            "BOX",
             "confident",
             "0/1",
             "",
@@ -68,6 +69,7 @@ def check_report_check(test: APITestCase, response: Response):
             "2012-10-03T10:01:48.200+00:00",
             "2012-10-03T10:03:44.800+00:00",
             "1",
+            "BOX",
             "no Confident",
             "1/1",
             "",

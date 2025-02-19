@@ -3,7 +3,7 @@ from .acoustic_features import (
     AcousticFeaturesCreateTestCase,
     AcousticFeaturesUpdateTestCase,
 )
-from .result import (
+from .results import (
     CreateTestCase as AnnotationResultSerializerCreateTestCase,
     UpdateTestCase as AnnotationResultSerializerUpdateTestCase,
 )
