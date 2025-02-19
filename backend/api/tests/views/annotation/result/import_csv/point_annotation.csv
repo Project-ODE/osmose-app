@@ -1,0 +1,2 @@
+dataset,start_frequency,end_frequency,annotation,annotator,start_datetime,end_datetime,is_box,confidence_indicator_label,confidence_indicator_level
+Dataset,32416,32416,click,detector1,2012-10-03T10:00:00.800+00:00,2012-10-03T10:00:00.800+00:00,1,sure,1/1

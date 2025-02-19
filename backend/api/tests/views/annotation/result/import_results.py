@@ -127,6 +127,7 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(response["end_time"], None)
         self.assertEqual(response["start_frequency"], None)
         self.assertEqual(response["end_frequency"], None)
+        self.assertEqual(response["type"], "Weak")
 
     def __check_weak_two_files_annotation(
         self,
@@ -144,6 +145,7 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(response[0]["end_time"], None)
         self.assertEqual(response[0]["start_frequency"], None)
         self.assertEqual(response[0]["end_frequency"], None)
+        self.assertEqual(response[0]["type"], "Weak")
         result_2 = results.exclude(id=result_1.id).first()
         # Second annotation doesn't cover all file -> strong
         self.__check_global_result(response[1])
@@ -154,6 +156,23 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(response[1]["end_time"], 10 * 60)
         self.assertEqual(response[1]["start_frequency"], 0)
         self.assertEqual(response[1]["end_frequency"], 64_000)
+        self.assertEqual(response[1]["type"], "Box")
+
+    def __check_point_annotation(
+        self,
+        response: dict,
+        result: AnnotationResult,
+        campaign_id: int,
+    ):
+        self.__check_global_result(response)
+        self.assertEqual(response["id"], result.id)
+        self.assertEqual(response["annotation_campaign"], campaign_id)
+        self.assertEqual(response["dataset_file"], 1)
+        self.assertEqual(response["start_time"], 0.8)
+        self.assertEqual(response["end_time"], None)
+        self.assertEqual(response["start_frequency"], 32416)
+        self.assertEqual(response["end_frequency"], None)
+        self.assertEqual(response["type"], "Point")
 
     def __check_strong_one_file_annotation(
         self,
@@ -169,6 +188,7 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(response["end_time"], 1.8)
         self.assertEqual(response["start_frequency"], 32416)
         self.assertEqual(response["end_frequency"], 53916)
+        self.assertEqual(response["type"], "Box")
 
     def __check_strong_two_files_annotation(
         self,
@@ -185,6 +205,7 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(response[0]["end_time"], 15 * 60)
         self.assertEqual(response[0]["start_frequency"], 32416)
         self.assertEqual(response[0]["end_frequency"], 53916)
+        self.assertEqual(response[0]["type"], "Box")
         result_2 = results.exclude(id=result_1.id).first()
         self.__check_global_result(response[1])
         self.assertEqual(response[1]["id"], result_2.id)
@@ -194,6 +215,7 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(response[1]["end_time"], 8)
         self.assertEqual(response[1]["start_frequency"], 32416)
         self.assertEqual(response[1]["end_frequency"], 53916)
+        self.assertEqual(response[1]["type"], "Box")
 
     # Common
 
@@ -226,6 +248,35 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
 
         results = AnnotationResult.objects.exclude(id__in=old_ids)
         self.__check_weak_two_files_annotation(response.data, results, campaign_id)
+
+    def test_empty_point(self):
+        url, campaign_id = self._get_url()
+        old_count = AnnotationResult.objects.count()
+        response = upload_csv_file(
+            self,
+            url,
+            f"{os.path.dirname(os.path.realpath(__file__))}/import_csv/point_annotation.csv",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(AnnotationResult.objects.count(), old_count + 1)
+
+        result = AnnotationResult.objects.latest("id")
+        self.__check_point_annotation(response.data[0], result, campaign_id)
+
+    def test_empty_point_no_end_frequency(self):
+        url, campaign_id = self._get_url()
+        old_count = AnnotationResult.objects.count()
+        response = upload_csv_file(
+            self,
+            url,
+            f"{os.path.dirname(os.path.realpath(__file__))}/import_csv/point_annotation_no_end_frequency.csv",
+        )
+        print("response", response.data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(AnnotationResult.objects.count(), old_count + 1)
+
+        result = AnnotationResult.objects.latest("id")
+        self.__check_point_annotation(response.data[0], result, campaign_id)
 
     def test_empty_post_strong_one_file(self):
         url, campaign_id = self._get_url()
@@ -459,7 +510,6 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
         self.assertEqual(AnnotationResult.objects.count(), old_count)
 
         self.assertEqual(response.data[0].get("min_frequency")[0].code, "invalid")
-        self.assertEqual(response.data[0].get("max_frequency")[0].code, "invalid")
 
     def test_empty_post_bellow_frequency(self):
         url, _ = self._get_url()

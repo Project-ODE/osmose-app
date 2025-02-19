@@ -181,7 +181,9 @@ class AnnotationResultViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                     "start_datetime": row["start_datetime"],
                     "end_datetime": row["end_datetime"],
                     "min_frequency": row["start_frequency"],
-                    "max_frequency": row["end_frequency"],
+                    "max_frequency": row["end_frequency"]
+                    if row["end_frequency"] != ""
+                    else None,
                     "label": row["annotation"],
                     "confidence_indicator": {
                         "label": row["confidence_indicator_label"],
