@@ -22,15 +22,15 @@ export const LabelSetModal: React.FC<{
   } ] = usePatchCampaignMutation();
   const { data: campaign, refetch: refetchCampaign } = useRetrieveCampaignQuery(_campaign.id);
 
-  const [ labelsWithAcousticFeatures, setLabelsWithAcousticFeatures ] = useState<string[]>(campaign?.labels_with_acoustic_features ?? []);
+  const [ labelsWithAcousticFeatures, setLabelsWithAcousticFeatures ] = useState<string[]>((campaign ?? _campaign).labels_with_acoustic_features);
   const [ disabled, setDisabled ] = useState<boolean>(true);
 
   useEffect(() => {
-    setLabelsWithAcousticFeatures(campaign?.labels_with_acoustic_features ?? []);
+    setLabelsWithAcousticFeatures((campaign ?? _campaign).labels_with_acoustic_features);
   }, [ campaign?.labels_with_acoustic_features ]);
 
   useEffect(() => {
-    if (patchError) toast.presentError(patchError);
+    if (patchError) toast.presentError(getErrorMessage(patchError));
   }, [ patchError ]);
   useEffect(() => {
     if (isPatchSuccessful) toast.presentSuccess(`Labels successfully updated`);

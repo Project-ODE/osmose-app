@@ -6,9 +6,9 @@ import { WriteAnnotationCampaign } from '../src/service/campaign';
 // Utils
 
 const STEP = {
-  checkLabel: (modal: LabelModal, label: string, state: boolean) => test.step(`${ label } is ${ state ? '' : 'un' }checked`, async () => {
+  checkLabelState: (modal: LabelModal, label: string, state: boolean) => test.step(`${ label } is ${ state ? '' : 'un' }checked`, async () => {
     await expect(modal.getByText(label)).toBeVisible()
-    expect(await modal.getCheckbox(label).getAttribute('checked')).toEqual(state ? 'true' : 'false')
+    await expect(modal.getCheckbox(label)).toHaveAttribute('checked', state ? 'true' : 'false');
   }),
 
   accessArchive: (page: Page) => test.step('Access archive', () => expect(page.campaign.detail.archiveButton).toBeEnabled()),
@@ -67,8 +67,8 @@ test.describe('Annotator', () => {
     })
 
     const modal = await page.campaign.detail.openLabelModal();
-    await STEP.checkLabel(modal, LABEL.classic, false);
-    await STEP.checkLabel(modal, LABEL.withFeatures, true);
+    await STEP.checkLabelState(modal, LABEL.classic, false);
+    await STEP.checkLabelState(modal, LABEL.withFeatures, true);
 
     await test.step('Cannot update', async () => {
       await expect(modal.updateButton).not.toBeVisible();
@@ -204,7 +204,7 @@ test.describe('Annotator', () => {
 
     await test.step('Files', async () => {
       await expect(page.getByText('No files to annotate')).toBeVisible();
-      await expect(page.campaign.detail.resumeButton).toBeDisabled();
+      await expect(page.campaign.detail.resumeButton).not.toBeVisible();
     })
   })
 })
@@ -227,8 +227,8 @@ test.describe('Campaign creator', () => {
     const modal = await page.campaign.detail.openLabelModal()
 
     await test.step('Check current state', async () => {
-      await STEP.checkLabel(modal, LABEL.classic, false);
-      await STEP.checkLabel(modal, LABEL.withFeatures, true);
+      await STEP.checkLabelState(modal, LABEL.classic, false);
+      await STEP.checkLabelState(modal, LABEL.withFeatures, true);
     })
 
     await test.step('Update state', async () => {
