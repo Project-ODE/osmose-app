@@ -72,7 +72,7 @@ test.describe('Annotator', () => {
         first_file_index: 0,
         last_file_index: DATASET.files_count - 1
       } ]
-      expect(fileRangeData).toEqual(expectedFileRanges);
+      expect(fileRangeData).toEqual({ data: expectedFileRanges });
     })
   })
 
