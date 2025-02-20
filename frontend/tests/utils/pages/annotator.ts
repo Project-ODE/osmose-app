@@ -3,15 +3,15 @@ import { UserType } from '../../fixtures';
 import { CampaignDetailPage } from './campaign-detail';
 import { Mock } from '../services';
 import { AnnotationCampaignUsage } from '../../../src/service/campaign';
-import { BoxBounds } from '../../../src/service/campaign/result';
+import { AnnotationResultType, BoxBounds, PointBounds } from '../../../src/service/campaign/result';
 
 export type Label = {
   addPresence: () => Promise<void>;
   selectLabel: () => Promise<void>;
   getLabelState: () => Promise<boolean>;
   remove: () => Promise<void>;
-  getPresenceResult: () => Locator;
-  getNthBoxResult: (nth: number) => Locator;
+  getWeakResult: () => Locator;
+  getNthStrongResult: (nth: number) => Locator;
 }
 export type Confidence = {
   select: () => Promise<void>;
@@ -111,10 +111,10 @@ export class AnnotatorPage {
       selectLabel: async () => {
         await this.page.locator('ion-chip').filter({ hasText: label }).click()
       },
-      getPresenceResult: () => {
+      getWeakResult: () => {
         return this.resultsBlock.getByText(label).first()
       },
-      getNthBoxResult: (nth: number) => {
+      getNthStrongResult: (nth: number) => {
         return this.resultsBlock.getByText(label).nth(1 + nth)
       },
       getLabelState: async () => {
@@ -136,25 +136,26 @@ export class AnnotatorPage {
     await this.page.evaluate(() => window.scrollTo({ left: 0, top: 0 }))
   }
 
-  drawBox(): Promise<Omit<BoxBounds, 'type'>> {
-    return test.step('Draw box', async () => {
+  draw(type: Exclude<AnnotationResultType, 'Weak'>): Promise<BoxBounds | PointBounds> {
+    return test.step(`Draw ${ type }`, async () => {
       await this.scrollTop();
       const canvas = this.page.locator('canvas.drawable').first()
       await expect(canvas).toBeVisible()
       await this.page.mouse.move(380, 410)
       await this.page.mouse.down({ button: 'left' })
-      await this.page.mouse.move(610, 480)
+      if (type === 'Box') await this.page.mouse.move(610, 480)
       await this.page.mouse.up({ button: 'left' })
       return {
+        type,
         start_time: 1.90292333149476,
-        end_time: 3.1715388858246003,
+        end_time: type === 'Box' ? 3.1715388858246003 : null,
         start_frequency: 82,
-        end_frequency: 115
-      }
+        end_frequency: type === 'Box' ? 115 : null
+      } as BoxBounds | PointBounds
     })
   }
 
-  async removeBox() {
+  async removeStrong() {
     await this.page.getByRole('button', { name: '' }).click()
   }
 }

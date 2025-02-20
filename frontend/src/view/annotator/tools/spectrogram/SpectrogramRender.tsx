@@ -242,6 +242,7 @@ export const SpectrogramRender = React.forwardRef<SpectrogramRender, Props>(({ a
 
   const onStartNewAnnotation = (e: MouseEvent<HTMLCanvasElement>) => {
     if (!_isDrawingEnabled.current) return;
+    if (!pointerService.isHoverCanvas(e)) return;
     const data = pointerService.getFreqTime(e);
     if (!data) return;
 

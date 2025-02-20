@@ -2,7 +2,7 @@ import { Locator, Page, test } from '@playwright/test';
 import { UserType } from '../../fixtures';
 import { AnnotationCampaignUsage } from '../../../src/service/campaign';
 import { AnnotatorPage, Confidence, Label } from './annotator';
-import { BoxBounds } from '../../../src/service/campaign/result';
+import { AnnotationResultType, BoxBounds, PointBounds } from '../../../src/service/campaign/result';
 
 export class AnnotatorNewPage extends AnnotatorPage {
 
@@ -61,17 +61,18 @@ export class AnnotatorNewPage extends AnnotatorPage {
     })
   }
 
-  async drawBox(): Promise<Omit<BoxBounds, 'type'>> {
-    await super.drawBox();
+  async draw(type: Exclude<AnnotationResultType, 'Weak'>): Promise<BoxBounds | PointBounds> {
+    await super.draw(type);
     return {
+      type,
       start_time: 1.90292333149476,
-      end_time: 3.1715388858246003,
-      start_frequency: 67,
-      end_frequency: 99
-    }
+      end_time: type === 'Box' ? 3.1715388858246003 : null,
+      start_frequency: type === 'Box' ? 67 : 99,
+      end_frequency: type === 'Box' ? 99 : null,
+    } as BoxBounds | PointBounds
   }
 
-  async removeBox(): Promise<void> {
+  async removeStrong(): Promise<void> {
     await this.page.locator('.remove-box').click()
   }
 }
