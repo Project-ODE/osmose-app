@@ -13,6 +13,13 @@ class ExpertiseLevel(models.TextChoices):
     NOVICE = ("N", "Novice")
 
 
+class Datawork(models.Model):
+    """Datawork model"""
+
+    name = models.CharField(unique=True, max_length=100)
+    folder_name = models.CharField(unique=True, max_length=100)
+
+
 class AploseUser(models.Model):
     """Override of default Django User model"""
 
@@ -25,3 +32,5 @@ class AploseUser(models.Model):
         default=ExpertiseLevel.NOVICE,
         help_text="Expertise level of the user.",
     )
+
+    allowed_datawork = models.ManyToManyField(Datawork, related_name="allowed_users")
