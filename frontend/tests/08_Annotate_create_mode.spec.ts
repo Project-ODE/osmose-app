@@ -1,6 +1,5 @@
 import { ESSENTIAL, expect, test } from './utils';
 import { CAMPAIGN, COMMENT, CONFIDENCE, FILE_RANGE, LABEL, UserType } from './fixtures';
-import { AnnotationResultBounds } from '../src/service/campaign/result';
 
 // Utils
 
@@ -94,13 +93,13 @@ const TEST = {
         const label = annotator.getLabel(LABEL.withFeatures);
         await label.getPresenceResult().click();
 
-        const bounds: AnnotationResultBounds = await annotator.drawBox();
+        const bounds = await annotator.drawBox();
 
         await expect(label.getNthBoxResult(0)).toBeVisible();
-        await expect(annotator.resultsBlock.getByText(Math.floor(bounds.start_time!).toString()).first()).toBeVisible();
-        await expect(annotator.resultsBlock.getByText(Math.floor(bounds.end_time!).toString()).first()).toBeVisible();
-        await expect(annotator.resultsBlock.getByText(bounds.start_frequency!.toString()).first()).toBeVisible();
-        await expect(annotator.resultsBlock.getByText(bounds.end_frequency!.toString()).first()).toBeVisible();
+        await expect(annotator.resultsBlock.getByText(Math.floor(bounds.start_time).toString()).first()).toBeVisible();
+        await expect(annotator.resultsBlock.getByText(Math.floor(bounds.end_time).toString()).first()).toBeVisible();
+        await expect(annotator.resultsBlock.getByText(bounds.start_frequency.toString()).first()).toBeVisible();
+        await expect(annotator.resultsBlock.getByText(bounds.end_frequency.toString()).first()).toBeVisible();
       })
 
       await test.step('Can remove box', async () => {

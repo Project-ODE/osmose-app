@@ -81,7 +81,7 @@ export const PresenceAbsence: React.FC = () => {
 
   // 'presence' class is for playwright tests
   return (
-    <div className={ [ styles.bloc, 'presence' ].join(' ') }>
+    <div className={ [ styles.bloc, styles.presence, 'presence' ].join(' ') }>
       <h6 className={ styles.header }>Presence / Absence</h6>
       <div className={ styles.body }>
         { label_set?.labels.map((label, key) => {

@@ -161,6 +161,10 @@ ion-label {
     padding-left: 1rem;
 }
 
+ion-chip ion-label {
+    padding-left: unset;
+}
+
 ion-label.mandatory {
     font-weight: 700;
 }

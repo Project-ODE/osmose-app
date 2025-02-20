@@ -50,15 +50,15 @@ const TEST = {
       await test.step('Initial state', async () => {
         await expect(page.annotator.resultsBlock.getByText(RESULTS.box.label).first()).toBeVisible()
         await expect(page.annotator.resultsBlock.getByText(RESULTS.box.confidence_indicator!)).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.start_frequency!.toString())).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.end_frequency!.toString())).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.start_time!).toString())).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.end_time!).toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.start_frequency.toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.end_frequency.toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.start_time).toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.end_time).toString())).toBeVisible()
         await page.annotator.presenceValidation.expectState(true)
         await page.annotator.boxValidation.expectState(true)
       })
 
-      await STEP.submit(page, { presenceIsValid: true, boxIsValid: true});
+      await STEP.submit(page, { presenceIsValid: true, boxIsValid: true });
     })
   },
   filledWithActions: (as: UserType, { isNew }: { isNew: boolean }) => {
@@ -70,10 +70,10 @@ const TEST = {
       await test.step('Initial state', async () => {
         await expect(page.annotator.resultsBlock.getByText(RESULTS.box.label).first()).toBeVisible()
         await expect(page.annotator.resultsBlock.getByText(RESULTS.box.confidence_indicator!)).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.start_frequency!.toString())).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.end_frequency!.toString())).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.start_time!).toString())).toBeVisible()
-        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.end_time!).toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.start_frequency.toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(RESULTS.box.end_frequency.toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.start_time).toString())).toBeVisible()
+        await expect(page.annotator.resultsBlock.getByText(Math.floor(RESULTS.box.end_time).toString())).toBeVisible()
         await page.annotator.presenceValidation.expectState(true)
         await page.annotator.boxValidation.expectState(true)
       })
@@ -106,7 +106,7 @@ const TEST = {
         await page.annotator.boxValidation.expectState(false)
       })
 
-      await STEP.submit(page, { presenceIsValid: true, boxIsValid: false});
+      await STEP.submit(page, { presenceIsValid: true, boxIsValid: false });
     })
   }
 }

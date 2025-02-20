@@ -114,3 +114,29 @@
   align-items: center;
   grid-auto-flow: column;
 }
+
+.point {
+  height: 2rem;
+  width: 2rem;
+  transform: translate(-50%, -50%);
+  border: none;
+
+  .vertical, .horizontal {
+    background: var(--ion-color-base);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 1px;
+  }
+
+  .vertical {
+    height: 2rem;
+    width: 2px;
+  }
+
+  .horizontal {
+    width: 2rem;
+    height: 2px;
+  }
+}

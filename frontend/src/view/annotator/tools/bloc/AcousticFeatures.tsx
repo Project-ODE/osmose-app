@@ -40,7 +40,7 @@ export const AcousticFeatures: React.FC = () => {
   const fileDuration = useFileDuration();
   const dispatch = useAppDispatch();
 
-  const { annotation, type, duration } = useCurrentAnnotation()
+  const { annotation, duration } = useCurrentAnnotation()
   const maxFrequency = useMaxFrequency();
 
   useEffect(() => {
@@ -60,10 +60,11 @@ export const AcousticFeatures: React.FC = () => {
   }
 
   function updateMinFrequency(value: number) {
-    if (!annotation) return;
+    if (annotation?.type !== 'Box') return;
     if (annotatorData) value = Math.min(value, annotatorData.file.dataset_sr)
     value = Math.max(value, 0)
     dispatch(updateFocusResultBounds({
+      type: annotation.type,
       start_frequency: value,
       end_frequency: Math.max(annotation.end_frequency ?? 0, value),
       start_time: annotation.start_time,
@@ -72,10 +73,11 @@ export const AcousticFeatures: React.FC = () => {
   }
 
   function updateMaxFrequency(value: number) {
-    if (!annotation) return;
+    if (annotation?.type !== 'Box') return;
     if (annotatorData) value = Math.min(value, annotatorData.file.dataset_sr)
     value = Math.max(value, 0)
     dispatch(updateFocusResultBounds({
+      type: annotation.type,
       start_frequency: Math.min(annotation.start_frequency ?? 0, value),
       end_frequency: value,
       start_time: annotation.start_time,
@@ -84,14 +86,15 @@ export const AcousticFeatures: React.FC = () => {
   }
 
   function updateDuration(value: number) {
-    if (!annotation) return;
+    if (annotation?.type !== 'Box') return;
     if (duration) value = Math.min(value, fileDuration)
     value = Math.max(value, 0)
     dispatch(updateFocusResultBounds({
+      type: annotation.type,
       start_frequency: annotation.start_frequency,
       end_frequency: annotation.end_frequency,
       start_time: annotation.start_time,
-      end_time: annotation.start_time! + value,
+      end_time: annotation.start_time + value,
     }))
   }
 
@@ -111,7 +114,7 @@ export const AcousticFeatures: React.FC = () => {
 
   if (!annotation) return;
   if (!campaign?.labels_with_acoustic_features.includes(annotation.label)) return;
-  if (type !== 'box') return;
+  if (annotation.type !== 'Box') return;
   return <div style={ { top, left } }
               className={ [ styles.bloc, styles.features ].join(' ') }
               onMouseDown={ e => e.stopPropagation() }>
@@ -146,7 +149,7 @@ export const AcousticFeatures: React.FC = () => {
 
           <TableContent>Min</TableContent>
           <TableContent className={ styles.cell }>
-              <Input value={ annotation.start_frequency! } type="number"
+              <Input value={ annotation.start_frequency } type="number"
                      min={ 0 } max={ maxFrequency }
                      disabled={ campaign?.usage === 'Check' }
                      onChange={ e => updateMinFrequency(+e.currentTarget.value) }/>
@@ -156,7 +159,7 @@ export const AcousticFeatures: React.FC = () => {
           <TableDivider className={ styles.span2ColsEnd }/>
           <TableContent>Max</TableContent>
           <TableContent className={ styles.cell }>
-              <Input value={ annotation.end_frequency! } type="number"
+              <Input value={ annotation.end_frequency } type="number"
                      min={ 0 } max={ maxFrequency }
                      disabled={ campaign?.usage === 'Check' }
                      onChange={ e => updateMaxFrequency(+e.currentTarget.value) }/>
@@ -165,7 +168,7 @@ export const AcousticFeatures: React.FC = () => {
 
           <TableDivider className={ styles.span2ColsEnd }/>
           <TableContent>Range</TableContent>
-          <TableContent><IonNote>{ annotation.end_frequency! - annotation.start_frequency! } Hz</IonNote></TableContent>
+          <TableContent><IonNote>{ annotation.end_frequency - annotation.start_frequency } Hz</IonNote></TableContent>
 
           <SelectableFrequencyRow label='Start'
                                   value={ annotation.acoustic_features.start_frequency ?? undefined }

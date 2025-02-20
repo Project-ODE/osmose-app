@@ -3,7 +3,7 @@ import { UserType } from '../../fixtures';
 import { CampaignDetailPage } from './campaign-detail';
 import { Mock } from '../services';
 import { AnnotationCampaignUsage } from '../../../src/service/campaign';
-import { AnnotationResultBounds } from '../../../src/service/campaign/result';
+import { BoxBounds } from '../../../src/service/campaign/result';
 
 export type Label = {
   addPresence: () => Promise<void>;
@@ -136,7 +136,7 @@ export class AnnotatorPage {
     await this.page.evaluate(() => window.scrollTo({ left: 0, top: 0 }))
   }
 
-  drawBox(): Promise<AnnotationResultBounds> {
+  drawBox(): Promise<Omit<BoxBounds, 'type'>> {
     return test.step('Draw box', async () => {
       await this.scrollTop();
       const canvas = this.page.locator('canvas.drawable').first()

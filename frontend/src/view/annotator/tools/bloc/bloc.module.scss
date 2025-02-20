@@ -7,6 +7,34 @@
   background: white;
   grid-template-rows: auto 1fr;
 
+  &.current {
+    grid-area: current;
+  }
+
+  &.presence {
+    grid-area: presence;
+  }
+
+  &.type {
+    grid-area: type;
+  }
+
+  &.labels {
+    grid-area: labels;
+  }
+
+  &.comments {
+    grid-area: comments;
+  }
+
+  &.results {
+    grid-area: results;
+  }
+
+  &.confidence {
+    grid-area: confidence;
+  }
+
   .header, .footer {
     background: var(--ion-color-light-shade);
     text-align: center;

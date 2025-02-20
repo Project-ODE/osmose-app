@@ -1,9 +1,10 @@
-import { AnnotationResult } from './type';
+import { WeakResult } from './type';
 
-export const DEFAULT_PRESENCE_RESULT: AnnotationResult = {
+export const DEFAULT_PRESENCE_RESULT: WeakResult = {
   id: -1,
   label: "",
   confidence_indicator: null,
+  type: 'Weak',
   start_time: null,
   end_time: null,
   start_frequency: null,

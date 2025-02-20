@@ -11,8 +11,8 @@ import React, {
 } from "react";
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import { useAudioService } from "@/services/annotator/audio.service.ts";
-import { AnnotationResult, AnnotationResultBounds } from '@/service/campaign/result';
-import { addResult, getResultType, leavePointerPosition, setPointerPosition, zoom } from '@/service/annotator';
+import { AnnotationResult, BoxBounds } from '@/service/campaign/result';
+import { addResult, leavePointerPosition, setPointerPosition, zoom } from '@/service/annotator';
 import { useToast } from "@/service/ui";
 import styles from '../annotator-tools.module.scss'
 import { YAxis } from "@/view/annotator/tools/spectrogram/YAxis.tsx";
@@ -48,8 +48,8 @@ export const SpectrogramRender = React.forwardRef<SpectrogramRender, Props>(({ a
     ui,
   } = useAppSelector(state => state.annotator)
   const dispatch = useAppDispatch()
-  const [ newResult, setNewResult ] = useState<AnnotationResultBounds | undefined>(undefined);
-  const _newResult = useRef<AnnotationResultBounds | undefined>(undefined);
+  const [ newResult, setNewResult ] = useState<BoxBounds | undefined>(undefined);
+  const _newResult = useRef<BoxBounds | undefined>(undefined);
   useEffect(() => {
     setNewResult(_newResult.current)
   }, [ _newResult.current ]);
@@ -246,6 +246,7 @@ export const SpectrogramRender = React.forwardRef<SpectrogramRender, Props>(({ a
     if (!data) return;
 
     _newResult.current = {
+      type: 'Box',
       start_time: data.time,
       end_time: data.time,
       start_frequency: data.frequency,
@@ -260,11 +261,11 @@ export const SpectrogramRender = React.forwardRef<SpectrogramRender, Props>(({ a
         _newResult.current.end_time = data.time;
         _newResult.current.end_frequency = data.frequency;
       }
-      if (getResultType(_newResult.current) !== 'box') return;
-      const start_time = Math.min(_newResult.current.start_time!, _newResult.current.end_time!);
-      const end_time = Math.max(_newResult.current.start_time!, _newResult.current.end_time!);
-      const start_frequency = Math.min(_newResult.current.start_frequency!, _newResult.current.end_frequency!);
-      const end_frequency = Math.max(_newResult.current.start_frequency!, _newResult.current.end_frequency!);
+      if (_newResult.current.type !== 'Box') return;
+      const start_time = Math.min(_newResult.current.start_time, _newResult.current.end_time);
+      const end_time = Math.max(_newResult.current.start_time, _newResult.current.end_time);
+      const start_frequency = Math.min(_newResult.current.start_frequency, _newResult.current.end_frequency);
+      const end_frequency = Math.max(_newResult.current.start_frequency, _newResult.current.end_frequency);
       _newResult.current.start_time = start_time;
       _newResult.current.end_time = end_time;
       _newResult.current.start_frequency = start_frequency;
@@ -280,10 +281,22 @@ export const SpectrogramRender = React.forwardRef<SpectrogramRender, Props>(({ a
       const height = yAxis.valuesToPositionRange(_newResult.current.start_frequency, _newResult.current.end_frequency);
       if (width > 2 && height > 2) {
         dispatch(addResult(_newResult.current))
+      } else {
+        dispatch(addResult({
+          type: 'Point',
+          start_time: _newResult.current.start_time,
+          start_frequency: _newResult.current.start_frequency,
+          end_time: null,
+          end_frequency: null
+        }))
       }
     }
     _newResult.current = undefined;
     if (!pointerService.isHoverCanvas(e)) dispatch(leavePointerPosition())
+  }
+
+  function onClick(e: MouseEvent<HTMLCanvasElement>) {
+    audioService.seek(pointerService.getFreqTime(e)?.time ?? 0)
   }
 
   const onWheel = (event: WheelEvent) => {
@@ -316,7 +329,7 @@ export const SpectrogramRender = React.forwardRef<SpectrogramRender, Props>(({ a
                 height={ height }
                 width={ width }
                 onMouseDown={ onStartNewAnnotation }
-                onClick={ e => audioService.seek(pointerService.getFreqTime(e)?.time ?? 0) }
+                onClick={ onClick }
                 onWheel={ onWheel }/>
 
         <TimeBar/>

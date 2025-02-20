@@ -24,7 +24,7 @@ export const LabelList: React.FC = () => {
 
   // 'label' class is for playwright tests
   return (
-    <div className={ [ styles.bloc, 'label' ].join(' ') }>
+    <div className={ [ styles.bloc, styles.labels, 'label' ].join(' ') }>
       <h6 className={ styles.header }>Labels list</h6>
       <div className={ styles.body }>
         { label_set?.labels.map((label, id) => {

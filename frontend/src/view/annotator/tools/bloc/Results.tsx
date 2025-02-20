@@ -13,7 +13,7 @@ import {
 import { FaHandshake } from 'react-icons/fa6';
 import { RiRobot2Fill } from 'react-icons/ri';
 import { AnnotationResult } from '@/service/campaign/result';
-import { focusResult, getResultType, invalidateResult, ResultType, validateResult } from '@/service/annotator';
+import { focusResult, invalidateResult, validateResult } from '@/service/annotator';
 import { formatTime } from '@/service/dataset/spectrogram-configuration/scale';
 import styles from './bloc.module.scss';
 import { Table, TableContent, TableDivider } from "@/components/table/table.tsx";
@@ -40,7 +40,7 @@ export const Results: React.FC = () => {
     [ results ])
 
   // 'results' class is for playwright tests
-  return <div className={ [ styles.bloc, 'results' ].join(' ') }>
+  return <div className={ [ styles.bloc, styles.results, 'results' ].join(' ') }>
     <h6 className={ styles.header }>Annotations</h6>
     <div className={ [ styles.body, styles.vertical ].join(' ') }>
 
@@ -61,11 +61,10 @@ const Result: React.FC<{
 }> = ({ result }) => {
   const { focusedResultID } = useAppSelector(state => state.annotator);
   const dispatch = useAppDispatch()
-  const type = useMemo(() => getResultType(result), [ result ]);
   const isActive = useMemo(() => result.id === focusedResultID ? styles.active : undefined, [ result.id, focusedResultID ])
   const onClick = () => dispatch(focusResult(result.id))
 
-  const params: ResultItemProps = { result, type, className: [ styles.item, isActive ].join(' '), onClick }
+  const params: ResultItemProps = { result, className: [ styles.item, isActive ].join(' '), onClick }
   return <Fragment>
     <ResultLabelInfo { ...params }/>
     <ResultTimeInfo { ...params }/>
@@ -79,54 +78,44 @@ const Result: React.FC<{
 
 type ResultItemProps = {
   result: AnnotationResult;
-  type: ResultType;
   className?: string;
   onClick: () => void;
 }
 
-const ResultTimeInfo: React.FC<ResultItemProps> = ({ result, type, className, onClick }) => {
-  if (type === 'presence') return <Fragment/>
+const ResultTimeInfo: React.FC<ResultItemProps> = ({ result, className, onClick }) => {
+  if (result.type === 'Weak') return <Fragment/>
   return <TableContent className={ className } onClick={ onClick }>
     <IoTimeOutline/>
 
     <p>
-      { formatTime(result.start_time!, true) }
-      { type === 'box' && <Fragment>
-          <IoChevronForwardOutline/> { formatTime(result.end_time!, true) }
+      { formatTime(result.start_time, true) }
+      { result.type === 'Box' && <Fragment>
+          <IoChevronForwardOutline/> { formatTime(result.end_time, true) }
       </Fragment> }
     </p>
   </TableContent>
 }
 
-const ResultFrequencyInfo: React.FC<ResultItemProps> = ({ result, type, className, onClick }) => {
-  const minFrequency = useMemo(() => {
-    if (result.start_frequency === null) return;
-    if (result.end_frequency === null) return result.start_frequency;
-    return Math.min(result.start_frequency, result.end_frequency)
-  }, [ result.start_frequency, result.end_frequency ])
-  const maxFrequency = useMemo(() => {
-    if (result.start_frequency === null || result.end_frequency === null) return;
-    return Math.max(result.start_frequency, result.end_frequency)
-  }, [ result.start_frequency, result.end_frequency ])
-  if (type === 'presence') return <Fragment/>
+const ResultFrequencyInfo: React.FC<ResultItemProps> = ({ result, className, onClick }) => {
+  if (result.type === 'Weak') return <Fragment/>
 
   return <TableContent className={ className } onClick={ onClick }>
     <IoAnalyticsOutline/>
 
     <p>
-      { minFrequency?.toFixed(2) }&nbsp;
-      { type === 'box' && <Fragment>
-          <IoChevronForwardOutline/> { maxFrequency?.toFixed(2) }
+      { result.start_frequency?.toFixed(2) }Hz
+      { result.type === 'Box' && <Fragment>
+          &nbsp;<IoChevronForwardOutline/> { result.end_frequency?.toFixed(2) }Hz
       </Fragment> }
-      Hz
     </p>
   </TableContent>
 }
 
-const ResultLabelInfo: React.FC<ResultItemProps> = ({ result, type, className, onClick }) => (
-  <TableContent className={ [ className, type === 'presence' ? styles.presenceLabel : styles.strongLabel ].join(' ') }
-                isFirstColumn={ true }
-                onClick={ onClick }>
+const ResultLabelInfo: React.FC<ResultItemProps> = ({ result, className, onClick }) => (
+  <TableContent
+    className={ [ className, result.type === 'Weak' ? styles.presenceLabel : styles.strongLabel ].join(' ') }
+    isFirstColumn={ true }
+    onClick={ onClick }>
     <IoPricetag/>
 
     <p>{ (result.label !== '') ? result.label : '-' }</p>

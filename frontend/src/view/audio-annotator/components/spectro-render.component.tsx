@@ -17,7 +17,7 @@ import { YAxis } from "@/view/audio-annotator/components/spectrogram/y-axis.comp
 import { useSpectrogramService } from "@/services/annotator/spectrogram.service.ts";
 import { usePointerService } from "@/services/annotator/pointer.service.ts";
 import { getDuration } from '@/service/dataset';
-import { AnnotationResult, AnnotationResultBounds } from '@/service/campaign/result';
+import { AnnotationResult, BoxBounds } from '@/service/campaign/result';
 import { addResult, leavePointerPosition, setPointerPosition, zoom } from '@/service/annotator';
 import { useToast } from "@/service/ui";
 import { ScaleMapping } from '@/service/dataset/spectrogram-configuration/scale';
@@ -72,8 +72,8 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
 
   const [ _zoom, _setZoom ] = useState<number>(1);
   const currentTime = useRef<number>(0)
-  const [ newResult, setNewResult ] = useState<AnnotationResultBounds | undefined>(undefined);
-  const _newResult = useRef<AnnotationResultBounds | undefined>(undefined);
+  const [ newResult, setNewResult ] = useState<BoxBounds | undefined>(undefined);
+  const _newResult = useRef<BoxBounds | undefined>(undefined);
   useEffect(() => {
     setNewResult(_newResult.current)
   }, [ _newResult.current ]);
@@ -251,6 +251,7 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
     if (!data) return;
 
     _newResult.current = {
+      type: 'Box',
       start_time: data.time,
       end_time: data.time,
       start_frequency: data.frequency,

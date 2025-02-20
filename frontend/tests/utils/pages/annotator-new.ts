@@ -2,7 +2,7 @@ import { Locator, Page, test } from '@playwright/test';
 import { UserType } from '../../fixtures';
 import { AnnotationCampaignUsage } from '../../../src/service/campaign';
 import { AnnotatorPage, Confidence, Label } from './annotator';
-import { AnnotationResultBounds } from '../../../src/service/campaign/result';
+import { BoxBounds } from '../../../src/service/campaign/result';
 
 export class AnnotatorNewPage extends AnnotatorPage {
 
@@ -61,7 +61,7 @@ export class AnnotatorNewPage extends AnnotatorPage {
     })
   }
 
-  async drawBox(): Promise<AnnotationResultBounds> {
+  async drawBox(): Promise<Omit<BoxBounds, 'type'>> {
     await super.drawBox();
     return {
       start_time: 1.90292333149476,

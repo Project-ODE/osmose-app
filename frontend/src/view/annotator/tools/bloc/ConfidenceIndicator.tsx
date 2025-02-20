@@ -22,9 +22,9 @@ export const ConfidenceIndicator: React.FC = () => {
 
   return (
     <TooltipOverlay title='Description' tooltipContent={ <p>{ confidence_set.desc }</p> }>
-      <div className={ styles.bloc }>
+      <div className={ [ styles.bloc, styles.confidence ].join(' ') }>
         <h6 className={ styles.header }>Confidence indicator</h6>
-        <div className={ [styles.body, styles.center].join(' ') }>
+        <div className={ [ styles.body, styles.center ].join(' ') }>
           { confidence_set.confidence_indicators.map((confidence, key) => (
             <IonChip key={ key } color="primary"
                      onClick={ () => dispatch(focusConfidence(confidence.label)) }

@@ -107,10 +107,12 @@
 
     &.create {
       grid-template-columns: 32ch 2fr 1fr;
+      grid-template-areas: "current presence labels" "comments results confidence";
     }
 
     &.check {
       grid-template-columns: 32ch minmax(32ch, auto) 1fr;
+      grid-template-areas: "current comments results";
     }
   }
 

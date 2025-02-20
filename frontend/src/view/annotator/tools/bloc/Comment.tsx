@@ -26,9 +26,9 @@ export const Comment: React.FC = () => {
     if (!task_comments) return false;
     return task_comments.filter(c => c.comment.trim().length > 0).length > 0;
   }, [ task_comments ]);
-  
+
   return (
-    <div className={ styles.bloc }>
+    <div className={ [ styles.bloc, styles.comments ].join(' ') }>
       <h6 className={ styles.header }>Comments</h6>
       <div className={ [ styles.body, styles.comment ].join(' ') }>
 

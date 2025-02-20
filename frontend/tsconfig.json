@@ -34,12 +34,15 @@
       ],
       "@/*": [
         "src/*"
-      ],
+      ]
     }
   },
   "include": [
     "src",
     "node_modules/@types/jest/index.d.ts"
+  ],
+  "exclude": [
+    "**/**.test.ts*"
   ],
   "references": [
     {

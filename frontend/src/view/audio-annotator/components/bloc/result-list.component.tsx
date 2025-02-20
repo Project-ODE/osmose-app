@@ -7,7 +7,7 @@ import { IoArrowUpOutline, IoChatbubble, IoChatbubbleOutline, IoPricetag, IoTime
 import { FaHandshake } from 'react-icons/fa6';
 import { RiRobot2Fill } from 'react-icons/ri';
 import { AnnotationResult } from '@/service/campaign/result';
-import { focusResult, getResultType, invalidateResult, ResultType, validateResult } from '@/service/annotator';
+import { focusResult, invalidateResult, validateResult } from '@/service/annotator';
 import { formatTime } from '@/service/dataset/spectrogram-configuration/scale';
 import { useParams } from "react-router-dom";
 import { useRetrieveCampaignQuery } from "@/service/campaign";
@@ -53,11 +53,10 @@ interface ResultProps {
 const ResultItem: React.FC<ResultProps> = ({ result }) => {
   const { focusedResultID } = useAppSelector(state => state.annotator);
   const dispatch = useAppDispatch()
-  const type = useMemo(() => getResultType(result), [ result ]);
   const isActive = useMemo(() => result.id === focusedResultID ? "isActive" : undefined, [ result.id, focusedResultID ])
   const onClick = () => dispatch(focusResult(result.id))
 
-  const params: ResultItemProps = { result, type, isActive, onClick }
+  const params: ResultItemProps = { result, isActive, onClick }
   return <Fragment>
     <ResultTimeInfo { ...params }/>
     <ResultFrequencyInfo { ...params }/>
@@ -71,32 +70,31 @@ const ResultItem: React.FC<ResultProps> = ({ result }) => {
 
 type ResultItemProps = {
   result: AnnotationResult;
-  type: ResultType;
   isActive?: string;
   onClick: () => void;
 }
 
-const ResultTimeInfo: React.FC<ResultItemProps> = ({ result, type, isActive, onClick }) => {
-  if (type === 'presence') return <Fragment/>
+const ResultTimeInfo: React.FC<ResultItemProps> = ({ result, isActive, onClick }) => {
+  if (result.type === 'Weak') return <Fragment/>
   return <div className={ isActive } onClick={ onClick }>
     <IoTimeOutline/>&nbsp;
-    { formatTime(result.start_time!) }&nbsp;
-    { type === 'box' && <Fragment>&gt;&nbsp;{ formatTime(result.end_time!) }&nbsp;</Fragment> }
+    { formatTime(result.start_time) }&nbsp;
+    { result.type === 'Box' && <Fragment>&gt;&nbsp;{ formatTime(result.end_time) }&nbsp;</Fragment> }
   </div>
 }
 
-const ResultFrequencyInfo: React.FC<ResultItemProps> = ({ result, type, isActive, onClick }) => {
-  if (type === 'presence') return <Fragment/>
+const ResultFrequencyInfo: React.FC<ResultItemProps> = ({ result, isActive, onClick }) => {
+  if (result.type === 'Weak') return <Fragment/>
   return <div className={ isActive } onClick={ onClick }>
     <IoArrowUpOutline/>&nbsp;
-    { result.start_frequency?.toFixed(2) }&nbsp;
-    { type === 'box' && <Fragment>&gt;&nbsp;{ result.end_frequency?.toFixed(2) }&nbsp;</Fragment> }
+    { result.start_frequency.toFixed(2) }&nbsp;
+    { result.type === 'Box' && <Fragment>&gt;&nbsp;{ result.end_frequency.toFixed(2) }&nbsp;</Fragment> }
     Hz
   </div>
 }
 
-const ResultLabelInfo: React.FC<ResultItemProps> = ({ result, type, isActive, onClick }) => (
-  <div className={ [ isActive, styles.label, type === 'presence' ? styles.presence : '' ].join(' ') }
+const ResultLabelInfo: React.FC<ResultItemProps> = ({ result, isActive, onClick }) => (
+  <div className={ [ isActive, styles.label, result.type === 'Weak' ? styles.presence : '' ].join(' ') }
        onClick={ onClick }>
     <IoPricetag/>&nbsp;
     { (result.label !== '') ? result.label : '-' }

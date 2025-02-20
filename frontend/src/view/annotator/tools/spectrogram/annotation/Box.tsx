@@ -1,17 +1,15 @@
 import React, { Fragment, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/service/app';
-import { useAudioService } from "@/services/annotator/audio.service.ts";
-import { AnnotationResult } from '@/service/campaign/result';
-import { focusResult, removeResult, updateFocusResultBounds } from '@/service/annotator';
-import { IoChatbubbleEllipses, IoChatbubbleOutline, IoPlayCircle, IoTrashBin } from "react-icons/io5";
+import { BoxResult } from '@/service/campaign/result';
+import { updateFocusResultBounds } from '@/service/annotator';
 import { useAnnotator } from "@/service/annotator/hook.ts";
-import styles from '../../annotator-tools.module.scss'
 import { ExtendedDiv } from '@/components/ui/ExtendedDiv';
 import { useAxis } from '@/service/annotator/spectrogram/scale';
 import { AbstractScale } from "@/service/dataset/spectrogram-configuration/scale";
+import { AnnotationHeader } from '@/view/annotator/tools/spectrogram/annotation/Headers.tsx';
 
 type RegionProps = {
-  annotation: AnnotationResult,
+  annotation: BoxResult,
   audioPlayer: MutableRefObject<HTMLAudioElement | null>;
 };
 
@@ -80,9 +78,6 @@ export const Box: React.FC<RegionProps> = ({
   const colorClassName: string = useMemo(() => label_set ? `ion-color-${ label_set.labels.indexOf(annotation.label) }` : '', [ label_set, annotation.label ]);
   const isActive = useMemo(() => annotation.id === focusedResultID, [ annotation.id, focusedResultID ]);
 
-  // Service
-  const audioService = useAudioService(audioPlayer);
-
   function updateLeft() {
     if (_start_time.current === null) return;
     _left.current = _xAxis.current.valueToPosition(_start_time.current);
@@ -121,6 +116,7 @@ export const Box: React.FC<RegionProps> = ({
 
   function onValidateMove() {
     dispatch(updateFocusResultBounds({
+      type: 'Box',
       end_frequency: _yAxis.current.positionToValue(_top.current),
       start_frequency: _yAxis.current.positionToValue(_top.current + _height.current),
       start_time: _xAxis.current.positionToValue(_left.current),
@@ -137,29 +133,14 @@ export const Box: React.FC<RegionProps> = ({
                       onLeftMove={ onLeftMove } onWidthMove={ onWidthMove }
                       className={ [ colorClassName, isActive ? '' : 'disabled' ].join(' ') }>
 
-    <ExtendedDiv draggable={ isActive && campaign?.usage === 'Create' }
-                 onTopMove={ onTopMove } onLeftMove={ onLeftMove }
-                 onUp={ onValidateMove }
-                 top={ top < 24 ? 24 : -8 }
-                 className={ [ styles.boxTitle, colorClassName, campaign?.usage === 'Create' ? styles.canBeRemoved : '' ].join(' ') }
-                 innerClassName={ styles.inner }
-                 onClick={ () => dispatch(focusResult(annotation.id)) }>
-
-      <IoPlayCircle className={ styles.button } onClick={ () => audioService.play(annotation) }/>
-
-      <p>{ annotation.label }</p>
-
-      { annotation.comments.length > 0 ?
-        <IoChatbubbleEllipses/> :
-        <IoChatbubbleOutline className={ styles.outlineIcon }/> }
-
-      {/* 'remove-box' class is for playwright tests*/ }
-      { campaign?.usage === 'Create' && (
-        <IoTrashBin className={ [ styles.button, styles.delete, 'remove-box' ].join(' ') }
-                    onClick={ () => dispatch(removeResult(annotation.id)) }/>
-      ) }
-
-    </ExtendedDiv>
+    <AnnotationHeader active={ isActive }
+                      onTopMove={ onTopMove }
+                      onLeftMove={ onLeftMove }
+                      onValidateMove={ onValidateMove }
+                      top={ top }
+                      className={ colorClassName }
+                      annotation={ annotation }
+                      audioPlayer={ audioPlayer }/>
 
   </ExtendedDiv>
 }

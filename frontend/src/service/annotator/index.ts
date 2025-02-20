@@ -8,11 +8,7 @@ export {
   CANVAS_DIMENSIONS
 } from './const'
 
-export {
-  getPresenceLabels,
-  getResultType,
-  getDefaultConfidence,
-} from './function';
+export * from './function';
 
 export * from './slice';
 

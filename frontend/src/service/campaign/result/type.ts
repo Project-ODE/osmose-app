@@ -8,13 +8,6 @@ export interface AnnotationResultValidations {
   is_valid: boolean;
 }
 
-export interface AnnotationResultBounds {
-  start_time: number | null; // null for presence
-  end_time: number | null; // null for presence or point
-  start_frequency: number | null; // null for presence
-  end_frequency: number | null; // null for presence or point
-}
-
 export const SignalTrends = [ "Flat", "Ascending", "Descending", "Modulated" ];
 export type SignalTrend = typeof SignalTrends[number];
 
@@ -30,7 +23,9 @@ export interface AcousticFeatures {
   steps_count: number | null;
 }
 
-export interface AnnotationResult extends AnnotationResultBounds {
+export type AnnotationResultType = 'Weak' | 'Point' | 'Box';
+
+interface BaseAnnotationResult {
   id: number;
   label: string;
   confidence_indicator: string | null;
@@ -43,8 +38,37 @@ export interface AnnotationResult extends AnnotationResultBounds {
   acoustic_features: AcousticFeatures | null;
 }
 
+export type WeakBounds = {
+  type: 'Weak',
+  start_time: null;
+  end_time: null;
+  start_frequency: null;
+  end_frequency: null;
+}
+export type PointBounds = {
+  type: 'Point',
+  start_time: number;
+  end_time: null;
+  start_frequency: number;
+  end_frequency: null;
+}
+export type BoxBounds = {
+  type: 'Box',
+  start_time: number;
+  end_time: number;
+  start_frequency: number;
+  end_frequency: number;
+}
+
+export type AnnotationResultBounds = WeakBounds | PointBounds | BoxBounds
+
+export type AnnotationResult = BaseAnnotationResult & AnnotationResultBounds
+export type WeakResult = BaseAnnotationResult & WeakBounds
+export type PointResult = BaseAnnotationResult & PointBounds
+export type BoxResult = BaseAnnotationResult & BoxBounds
+
 export type WriteAnnotationResult =
-  Omit<AnnotationResult, "id" | "comments" | "validations" | "annotation_campaign" | "dataset_file" | "annotator" | "confidence_indicator" | "detector_configuration">
+  Omit<AnnotationResult, "id" | "comments" | "validations" | "annotation_campaign" | "dataset_file" | "annotator" | "confidence_indicator" | "detector_configuration" | 'type'>
   & {
   id?: number;
   confidence_indicator: string | undefined;
@@ -53,16 +77,3 @@ export type WriteAnnotationResult =
   validations: Array<Omit<AnnotationResultValidations, "id" | "annotator" | "result"> & { id?: number }>;
   acoustic_features: AcousticFeatures | null;
 };
-
-export interface ImportAnnotationResult {
-  is_box: boolean;
-  dataset: string;
-  detector: string;
-  detector_config: string;
-  start_datetime: string; // datetime
-  end_datetime: string; // datetime
-  min_frequency: number;
-  max_frequency: number;
-  label: string;
-  confidence_indicator: string | null;
-}

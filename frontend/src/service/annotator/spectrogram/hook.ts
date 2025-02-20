@@ -6,8 +6,7 @@ import { useAnnotator } from '@/service/annotator/hook.ts';
 import { getDuration } from '@/service/dataset';
 import { useAxis } from '@/service/annotator/spectrogram/scale';
 import { useToast } from '@/service/ui';
-import { getResultType } from '@/service/annotator';
-import { AnnotationResultBounds } from '@/service/campaign/result';
+import { BoxBounds } from '@/service/campaign/result';
 import { buildErrorMessage } from '@/services/utils/format.tsx';
 
 
@@ -77,7 +76,8 @@ export const useDisplaySpectrogram = (
     return Promise.all(
       Array.from(new Array<HTMLImageElement | undefined>(zoomLevel)).map(async (_, index) => {
         const src = `${ currentConfiguration.folder_path.replaceAll('%5C', '/') }/${ filename }_${ zoomLevel }_${ index }.png`;
-        if (failedSources.current.includes(src)) return;console.info(`Will load for zoom ${ zoomLevel }, image ${ index }`)
+        if (failedSources.current.includes(src)) return;
+        console.info(`Will load for zoom ${ zoomLevel }, image ${ index }`)
         const image = new Image();
         image.src = src;
         return await new Promise<HTMLImageElement | undefined>((resolve) => {
@@ -130,15 +130,15 @@ export const useDisplaySpectrogram = (
     }
   }
 
-  function drawResult(result: AnnotationResultBounds) {
+  function drawResult(result: BoxBounds) {
     const context = canvas.current?.getContext('2d', { alpha: false });
-    if (!canvas.current || !context || getResultType(result) !== 'box') return;
+    if (!canvas.current || !context) return;
     context.strokeStyle = 'blue';
     context.strokeRect(
-      xAxis.valueToPosition(Math.min(result.start_time!, result.end_time!)),
-      yAxis.valueToPosition(Math.max(result.start_frequency!, result.end_frequency!)),
-      Math.floor(xAxis.valuesToPositionRange(result.start_time!, result.end_time!)),
-      yAxis.valuesToPositionRange(result.start_frequency!, result.end_frequency!)
+      xAxis.valueToPosition(Math.min(result.start_time, result.end_time)),
+      yAxis.valueToPosition(Math.max(result.start_frequency, result.end_frequency)),
+      Math.floor(xAxis.valuesToPositionRange(result.start_time, result.end_time)),
+      yAxis.valuesToPositionRange(result.start_frequency, result.end_frequency)
     );
 
   }
@@ -155,13 +155,14 @@ export const useCurrentAnnotation = () => {
     results,
     focusedResultID,
   } = useAppSelector(state => state.annotator);
+
   const annotation = useMemo(() => results?.find(r => r.id === focusedResultID), [ results, focusedResultID ]);
-  const type = useMemo(() => annotation ? getResultType(annotation) : undefined, [ annotation ]);
+  
   const duration = useMemo(() => {
-    if (!annotation) return;
-    const minTime = Math.min(annotation.start_time!, annotation.end_time!)
-    const maxTime = Math.max(annotation.start_time!, annotation.end_time!)
+    if (annotation?.type !== 'Box') return;
+    const minTime = Math.min(annotation.start_time, annotation.end_time)
+    const maxTime = Math.max(annotation.start_time, annotation.end_time)
     return +(maxTime - minTime).toFixed(3)
   }, [ annotation?.start_time, annotation?.end_time ]);
-  return { annotation, type, duration }
+  return { annotation, duration }
 }

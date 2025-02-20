@@ -3,7 +3,7 @@ import { DEFAULT_COLOR } from "@/consts/colors.const.tsx";
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import { useAudioService } from "@/services/annotator/audio.service.ts";
 import { AnnotationResult } from '@/service/campaign/result';
-import { focusResult, getResultType, removeResult } from '@/service/annotator';
+import { focusResult, removeResult } from '@/service/annotator';
 import { ScaleMapping } from '@/service/dataset/spectrogram-configuration/scale';
 import { useAnnotator } from "@/service/annotator/hook.ts";
 
@@ -61,7 +61,6 @@ export const Region: React.FC<RegionProps> = ({
 
   const color = useMemo(() => labelColors[annotation.label] ?? DEFAULT_COLOR, [ labelColors, annotation.label ])
   const isActive = useMemo(() => annotation.id === focusedResultID, [ annotation.id, focusedResultID ])
-  const type = useMemo(() => getResultType(annotation), [ annotation ]);
 
 
   const bodyRegion = useMemo(() => <div className="region-body"
@@ -70,7 +69,7 @@ export const Region: React.FC<RegionProps> = ({
                                           height
                                         } }></div>, [ color, height ])
 
-  if (type !== 'box') return <Fragment/>
+  if (annotation.type !== 'Box') return <Fragment/>
   return (
     <div className={ "region " + (isActive ? 'active' : '') }
          style={ {
