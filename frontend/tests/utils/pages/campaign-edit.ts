@@ -1,12 +1,20 @@
 import { Page, test } from '@playwright/test';
 import { Mock } from '../services';
-import { UserType } from '../../fixtures';
+import { CAMPAIGN, UserType } from '../../fixtures';
 import { CampaignDetailPage } from './campaign-detail';
 
 export class CampaignEditPage {
 
+  get firstIndexInputs() {
+    return this.page.getByPlaceholder('1')
+  }
 
-  constructor(page: Page,
+
+  get lastIndexInputs() {
+    return this.page.getByPlaceholder((CAMPAIGN.files_count - 1).toString())
+  }
+
+  constructor(private page: Page,
               private detail = new CampaignDetailPage(page),
               private mock = new Mock(page)) {
   }

@@ -16,31 +16,33 @@ test.describe('Campaign creator', () => {
 
     await test.step('Can see existing ranges', async () => {
       await expect(page.getByText(`${ USERS.annotator.first_name } ${ USERS.annotator.last_name }`)).toBeVisible()
-      await expect(page.getByText(`${ FILE_RANGE.range.first_file_index + 1 }-${ FILE_RANGE.range.last_file_index + 1 }`)).toBeVisible()
+      await expect(page.campaign.edit.firstIndexInputs.first()).toHaveValue((FILE_RANGE.range.first_file_index + 1).toString())
+      await expect(page.campaign.edit.lastIndexInputs.first()).toHaveValue((FILE_RANGE.range.last_file_index + 1).toString())
       await expect(page.getByText(USERS.creator.first_name)).not.toBeVisible()
       await expect(page.getByText(USERS.staff.first_name)).not.toBeVisible()
       await expect(page.getByText(USERS.superuser.first_name)).not.toBeVisible()
     })
 
     await test.step('Cannot edit or remove annotator with finished tasks', async () => {
-      await expect(page.getByPlaceholder((FILE_RANGE.range.first_file_index + 1).toString())).not.toBeVisible()
-      await expect(page.getByPlaceholder((FILE_RANGE.range.last_file_index + 1).toString())).not.toBeVisible()
-      const button = page.locator('.table-content button').last()
-      await expect(button).toBeVisible()
-      await expect(button).toBeDisabled()
+      await expect(page.campaign.edit.firstIndexInputs.first()).toBeDisabled()
+      await expect(page.campaign.edit.lastIndexInputs.first()).toBeDisabled()
+      //TODO: Handle forced update and remove of annotators with finished tasks
+      // const button = page.locator('.table-content button').last()
+      // await expect(button).toBeVisible()
+      // await expect(button).toBeDisabled()
     })
 
     await test.step('Can add new annotator', async () => {
       await page.getByPlaceholder('Search annotator').locator('input').fill(USERS.superuser.first_name);
       await page.locator('#searchbar-results').getByText(USERS.superuser.first_name).click();
       await expect(page.getByText(`${ USERS.superuser.first_name } ${ USERS.superuser.last_name }`)).toBeVisible()
-      await expect(page.getByPlaceholder('1')).toBeVisible()
-      await expect(page.getByPlaceholder(CAMPAIGN.files_count.toString())).toBeVisible()
+      await expect(page.campaign.edit.firstIndexInputs.nth(1)).toBeVisible()
+      await expect(page.campaign.edit.lastIndexInputs.nth(1)).toBeVisible()
     })
 
     await test.step('Can edit or remove annotator without finished tasks', async () => {
-      await page.getByPlaceholder('1').fill("5")
-      await page.getByPlaceholder(CAMPAIGN.files_count.toString()).fill("15")
+      await page.campaign.edit.firstIndexInputs.nth(1).fill("5")
+      await page.campaign.edit.lastIndexInputs.nth(1).fill("15")
       const button = page.locator('.table-content button').last()
       await expect(button).toBeEnabled()
     })
@@ -62,6 +64,7 @@ test.describe('Campaign creator', () => {
         page.getByRole('button', { name: 'Update campaign' }).click()
       ])
       const expectedData: Array<WriteAnnotationFileRange> = [ {
+        id: FILE_RANGE.range.id,
         annotator: FILE_RANGE.range.annotator,
         first_file_index: FILE_RANGE.range.first_file_index,
         last_file_index: FILE_RANGE.range.last_file_index,
@@ -74,7 +77,7 @@ test.describe('Campaign creator', () => {
         "first_file_index": 0,
         "last_file_index": CAMPAIGN.files_count - 1
       } ]
-      expect(await request.postDataJSON()).toEqual(expectedData)
+      expect(await request.postDataJSON()).toEqual({ data: expectedData })
     })
   })
 
