@@ -7,7 +7,7 @@ import { DATASET } from './dataset';
 
 export const COMMENT = {
   task: {
-    id: -1,
+    id: 1,
     comment: 'A task comment',
     annotation_campaign: CAMPAIGN.id,
     annotation_result: null,
@@ -15,17 +15,17 @@ export const COMMENT = {
     dataset_file: FILE_RANGE.unsubmittedFile.id
   } satisfies AnnotationComment,
   presence: {
-    id: -2,
+    id: 2,
     comment: 'A presence comment',
     annotation_campaign: CAMPAIGN.id,
-    annotation_result: -1, // RESULTS.presence.id
+    annotation_result: 1, // RESULTS.presence.id
     author: USERS.annotator.id,
     dataset_file: FILE_RANGE.unsubmittedFile.id
   } satisfies AnnotationComment
 }
 export const RESULTS: { presence: WeakResult, box: BoxResult } = {
   presence: {
-    id: -1,
+    id: 1,
     label: LABEL.classic,
     type: 'Weak',
     start_time: null,
@@ -42,7 +42,7 @@ export const RESULTS: { presence: WeakResult, box: BoxResult } = {
     detector_configuration: null,
   },
   box: {
-    id: -2,
+    id: 2,
     label: LABEL.classic,
     type: 'Box',
     start_time: 5,

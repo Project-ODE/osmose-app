@@ -14,20 +14,20 @@ const withFeatures = 'Whistle'
 export const LABEL = {
   classic, withFeatures,
   set: {
-    id: -1,
+    id: 1,
     name: 'Test label set',
     labels: [ classic, withFeatures ]
   } satisfies LabelSet
 }
 
 const notSure: ConfidenceIndicator = {
-  id: -1,
+  id: 1,
   level: 0,
   is_default: false,
   label: 'not sure'
 }
 const sure: ConfidenceIndicator = {
-  id: -2,
+  id: 2,
   level: 1,
   is_default: true,
   label: 'sure'
@@ -35,7 +35,7 @@ const sure: ConfidenceIndicator = {
 export const CONFIDENCE = {
   sure, notSure,
   set: {
-    id: -1,
+    id: 1,
     name: 'Test confidence set',
     desc: 'My test confidence indicator set',
     confidence_indicators: [ notSure, sure ]
@@ -43,11 +43,11 @@ export const CONFIDENCE = {
 }
 
 export const CAMPAIGN = {
-  id: -1,
+  id: 1,
   owner: USERS.creator.username,
   name: 'Test campaign',
   desc: 'Test campaign description',
-  deadline: deadline.toISOString(),
+  deadline: deadline.toISOString().split('T')[0],
   files_count: DATASET.files_count,
   created_at: new Date().toISOString(),
   label_set: LABEL.set.id,
@@ -70,7 +70,7 @@ end.setTime(start.getTime() + 10_000);
 
 export const FILE_RANGE = {
   unsubmittedFile: {
-    id: -1,
+    id: 1,
     is_submitted: false,
     results_count: 0,
     dataset_sr: DATASET_SR,
@@ -82,7 +82,7 @@ export const FILE_RANGE = {
     audio_url: ''
   } satisfies AnnotationFile,
   submittedFile: {
-    id: -2,
+    id: 2,
     is_submitted: true,
     results_count: 2,
     dataset_sr: DATASET_SR,
@@ -94,7 +94,7 @@ export const FILE_RANGE = {
     audio_url: ''
   } satisfies AnnotationFile,
   range: {
-    id: -1,
+    id: 1,
     files_count: 2,
     first_file_index: 2,
     last_file_index: 3,
@@ -107,9 +107,9 @@ export const FILE_RANGE = {
 export const DETECTOR_CONFIGURATION = 'Test configuration';
 export const DETECTOR: Detector = {
   name: 'detector1',
-  id: -1,
+  id: 1,
   configurations: [ {
-    id: -1,
+    id: 1,
     configuration: DETECTOR_CONFIGURATION
   } ]
 }

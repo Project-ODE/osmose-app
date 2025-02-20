@@ -8,7 +8,7 @@ export const AUTH = {
 
 const BASE_USER: User = {
   username: AUTH.username,
-  id: -1,
+  id: 1,
   email: 'user@user.com',
   first_name: 'User',
   last_name: 'Test',
@@ -19,7 +19,7 @@ const BASE_USER: User = {
 export type UserType = 'annotator' | 'creator' | 'staff' | 'superuser';
 export const USERS: { [key in UserType]: User } = {
   annotator: { ...BASE_USER, username: 'annotator', first_name: 'Annotator' },
-  creator: { ...BASE_USER, id: -2, username: 'creator', first_name: 'Creator' },
-  staff: { ...BASE_USER, id: -3, is_staff: true, username: 'staff', first_name: 'Staff' },
-  superuser: { ...BASE_USER, id: -4, is_superuser: true, username: 'superuser', first_name: 'Superuser' },
+  creator: { ...BASE_USER, id: 2, username: 'creator', first_name: 'Creator' },
+  staff: { ...BASE_USER, id: 3, is_staff: true, username: 'staff', first_name: 'Staff' },
+  superuser: { ...BASE_USER, id: 4, is_superuser: true, username: 'superuser', first_name: 'Superuser' },
 }

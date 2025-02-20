@@ -4,7 +4,7 @@ import { AudioMetadatum } from '../../src/service/dataset/audio-metatada';
 
 export const DATASET_SR: number = 480
 export const SPECTROGRAM_CONFIGURATION: SpectrogramConfiguration = {
-  id: -1,
+  id: 1,
   name: '2048_2048_50',
   desc: '',
   nfft: 2048,
@@ -36,7 +36,7 @@ export const SPECTROGRAM_CONFIGURATION: SpectrogramConfiguration = {
   zoom_level: 2,
 }
 export const AUDIO_METADATA: AudioMetadatum = {
-  id: -1,
+  id: 1,
   channel_count: 8,
   dataset_sr: 240,
   end: "2022-07-13T06:00:00Z",
@@ -44,7 +44,7 @@ export const AUDIO_METADATA: AudioMetadatum = {
   start: "2021-08-02T00:00:00Z",
 }
 export const DATASET: Dataset = {
-  id: -1,
+  id: 1,
   name: 'Test dataset',
   created_at: new Date().toISOString(),
   files_type: ".wav",

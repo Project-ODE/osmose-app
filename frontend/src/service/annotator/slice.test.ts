@@ -105,7 +105,7 @@ const mockState: AnnotatorState = {
 
   userPreferences: {
     audioSpeed: 1,
-    spectrogramConfigurationID: -1,
+    spectrogramConfigurationid: 1,
     zoomLevel: -1
   },
   ui: {},
@@ -141,7 +141,7 @@ describe("Filled state - not focused result", () => {
     const response = AnnotatorSlice.reducer(previousState, addResult(newBoxResult));
     const expectedNewResult: AnnotationResult = {
       ...newBoxResult,
-      id: -1,
+      id: 1,
       label: previousState.focusedLabel!,
       confidence_indicator: previousState.focusedConfidenceLabel ?? null,
       comments: [],
@@ -210,7 +210,7 @@ describe("Filled state - not focused result", () => {
   test("Should add presence", () => {
     const response = AnnotatorSlice.reducer(previousState, addPresenceResult({ label: newPresence }));
     const expectedNewResult: AnnotationResult = {
-      id: -1,
+      id: 1,
       type: 'Weak',
       start_frequency: null,
       start_time: null,
@@ -283,7 +283,7 @@ describe("Filled state - not focused result", () => {
       validations: [ {
         is_valid: false,
         result: mockState.results![1].id,
-        id: -1,
+        id: 1,
         annotator: 1,
       } ]
     }
@@ -304,7 +304,7 @@ describe("Filled state - not focused result", () => {
       validations: [ {
         is_valid: true,
         result: mockState.results![1].id,
-        id: -1,
+        id: 1,
         annotator: 1,
       } ]
     }
@@ -331,7 +331,7 @@ describe("Filled state - not focused result", () => {
       validations: [ {
         is_valid: false,
         result: mockState.results![1].id,
-        id: -1,
+        id: 1,
         annotator: 1,
       } ]
     }
