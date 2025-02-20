@@ -270,7 +270,7 @@ class AnnotationCampaignViewSet(
                     "start_datetime": """
                     SELECT 
                         CASE 
-                            WHEN annotation_results.start_time isnull  THEN to_char((f.start)::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
+                            WHEN annotation_results.type = 'W' THEN to_char((f.start)::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
                             ELSE to_char((f.start + annotation_results.start_time * interval '1 second')::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
                         END
                     FROM dataset_files f
@@ -279,7 +279,8 @@ class AnnotationCampaignViewSet(
                     "end_datetime": """
                     SELECT 
                         CASE 
-                            WHEN annotation_results.end_time isnull  THEN to_char((f."end")::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
+                            WHEN annotation_results.type = 'W' THEN to_char((f."end")::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
+                            WHEN annotation_results.type = 'P' THEN to_char((f.start + annotation_results.start_time * interval '1 second')::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
                             ELSE to_char((f.start + annotation_results.end_time * interval '1 second')::timestamp at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MSOF":00"')
                         END
                     FROM dataset_files f
