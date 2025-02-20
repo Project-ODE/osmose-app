@@ -12,6 +12,7 @@ test.describe('Annotator', () => {
   test('Can filter campaigns', async ({ page }) => {
     await page.campaign.list.go('annotator');
     await test.step('Search', async () => {
+      await page.mock.campaigns()
       await Promise.all([
         page.waitForRequest(/.*\/api\/annotation-campaign\/?\?.*search/g),
         page.campaign.list.search(CAMPAIGN.name),
@@ -19,6 +20,7 @@ test.describe('Annotator', () => {
     })
 
     await test.step('Remove My work filter', async () => {
+      await page.mock.campaigns()
       await Promise.all([
         page.waitForRequest(/\/api\/annotation-campaign\/\?((?!annotator).)*$/g),
         page.getByText('My work').click()
@@ -26,6 +28,7 @@ test.describe('Annotator', () => {
     })
 
     await test.step('Add Only archived filter', async () => {
+      await page.mock.campaigns()
       await Promise.all([
         page.waitForRequest(/\/api\/annotation-campaign\/x?\?.*archive__isnull=false.*$/g),
         page.getByText('Only archived').click()
@@ -33,6 +36,7 @@ test.describe('Annotator', () => {
     })
 
     await test.step('Add Campaign mode to Create filter', async () => {
+      await page.mock.campaigns()
       await Promise.all([
         page.waitForRequest(/\/api\/annotation-campaign\/?\?.*?usage=0/g),
         page.getByText('Campaign mode filter').click()
@@ -40,6 +44,7 @@ test.describe('Annotator', () => {
     })
 
     await test.step('Change Campaign mode to Check filter', async () => {
+      await page.mock.campaigns()
       await Promise.all([
         page.waitForRequest(/\/api\/annotation-campaign\/?\?.*?usage=1/g),
         page.getByText('Campaign mode filter').click()
@@ -47,6 +52,7 @@ test.describe('Annotator', () => {
     })
 
     await test.step('Add Owned campaigns filter', async () => {
+      await page.mock.campaigns()
       await Promise.all([
         page.waitForRequest(/\/api\/annotation-campaign\/?\?.*?owner/g),
         page.getByText('Owned campaigns').click()
@@ -56,7 +62,11 @@ test.describe('Annotator', () => {
 
   test('Can access campaign creation', ESSENTIAL, async ({ page }) => {
     await page.campaign.list.go('annotator');
+    await page.mock.users()
+    await page.mock.datasets()
     await page.campaign.list.createButton.click()
+    await page.mock.users()
+    await page.mock.datasets()
     await expect(page.getByRole('heading', { name: 'Create Annotation Campaign' })).toBeVisible();
   })
 
