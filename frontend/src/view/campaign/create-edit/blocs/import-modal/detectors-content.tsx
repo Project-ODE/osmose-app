@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from '@/service/app';
 import { FormBloc, Select } from "@/components/form";
 import { Detector, useListDetectorQuery } from '@/service/campaign/detector';
 import { useToast } from "@/service/ui";
-import { getErrorMessage } from '@/service/function.ts';
 import { DetectorSelection, setDetectors as saveDetectors } from '@/service/campaign';
 
 interface Props {
@@ -30,7 +29,7 @@ export const DetectorsContent: React.FC<Props> = ({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (detectorListError) toast.presentError(getErrorMessage(detectorListError));
+    if (detectorListError) toast.presentError(detectorListError);
   }, [ detectorListError ])
 
   const availableDetectors: string[] | undefined = useMemo(() => {

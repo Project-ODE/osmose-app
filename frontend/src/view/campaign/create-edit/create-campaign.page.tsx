@@ -19,7 +19,6 @@ import { useAppDispatch, useAppSelector } from '@/service/app';
 import { Errors } from '@/service/type.ts';
 import { DataBloc } from '@/view/campaign/create-edit/blocs/data.bloc.tsx';
 import { AnnotationBloc } from '@/view/campaign/create-edit/blocs/annotation.bloc.tsx';
-import { getErrorMessage } from '@/service/function.ts';
 import { usePostAnnotationFileRangeMutation } from '@/service/campaign/annotation-file-range';
 import { useImportResultMutation } from '@/service/campaign/result';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
@@ -59,7 +58,7 @@ export const CreateCampaign: React.FC = () => {
 
       history.push(`/annotation-campaign/${ campaign.id }`);
     } catch (e: any) {
-      toast.presentError(getErrorMessage(e));
+      toast.presentError(e);
     }
   }
 

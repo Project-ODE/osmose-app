@@ -19,7 +19,7 @@ export const AudioMetadataModal: React.FC<{
   const [ download, { error: downloadError } ] = useDownloadAudioMetadataMutation()
 
   useEffect(() => {
-    if (downloadError) toast.presentError(getErrorMessage(downloadError));
+    if (downloadError) toast.presentError(downloadError);
   }, [ downloadError ]);
 
   function onDownload() {

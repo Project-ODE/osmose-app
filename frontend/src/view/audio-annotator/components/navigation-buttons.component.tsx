@@ -8,7 +8,6 @@ import { caretBack, caretForward } from "ionicons/icons";
 import { useAppSelector } from '@/service/app';
 import { useAnnotatorSubmitService } from "@/services/annotator/submit.service.ts";
 import { useToast } from "@/service/ui";
-import { getErrorMessage } from '@/service/function.ts';
 import { KEY_DOWN_EVENT } from "@/service/events";
 import { useAnnotator } from "@/service/annotator/hook.ts";
 
@@ -101,7 +100,7 @@ export const NavigationButtons: React.FC = () => {
         history.push(`/annotation-campaign/${ campaignID }`)
       }
     } catch (e: any) {
-      toast.presentError(getErrorMessage(e))
+      toast.presentError(e)
     } finally {
       isSubmitting.current = false;
     }

@@ -4,7 +4,7 @@ import { ToastButton } from "@ionic/core/dist/types/components/toast/toast-inter
 import { getErrorMessage } from "@/service/function.ts";
 
 export const useToast = () => {
-  const [present, dismiss] = useIonToast();
+  const [ present, dismiss ] = useIonToast();
 
   function presentError(e: any, canForce: boolean = false): Promise<boolean> {
     return new Promise<boolean>((resolve) => {

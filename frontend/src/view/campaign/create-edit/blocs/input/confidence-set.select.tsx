@@ -3,7 +3,6 @@ import { useToast } from "@/service/ui";
 import { Select } from "@/components/form";
 import { IonNote } from '@ionic/react';
 import { useListConfidenceSetQuery } from '@/service/campaign/confidence-set';
-import { getErrorMessage } from '@/service/function.ts';
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import {
   selectCampaignSubmissionErrors,
@@ -37,7 +36,7 @@ export const ConfidenceSetSelect: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    if (confidenceSetError) presentError(getErrorMessage(confidenceSetError))
+    if (confidenceSetError) presentError(confidenceSetError)
   }, [ confidenceSetError ]);
 
   return <Select label="Confidence indicator set" placeholder="Select a confidence set"

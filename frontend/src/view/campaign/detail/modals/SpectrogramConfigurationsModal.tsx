@@ -28,7 +28,7 @@ export const SpectrogramConfigurationsModal: React.FC<{
   const [ download, { error: downloadError } ] = useDownloadSpectrogramConfigurationMutation()
 
   useEffect(() => {
-    if (downloadError) toast.presentError(getErrorMessage(downloadError));
+    if (downloadError) toast.presentError(downloadError);
   }, [ downloadError ]);
 
   function onDownload() {

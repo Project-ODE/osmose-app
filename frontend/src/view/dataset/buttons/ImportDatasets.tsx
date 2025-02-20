@@ -5,7 +5,6 @@ import {
   useListDatasetForImportQuery,
   useListDatasetQuery
 } from "@/service/dataset";
-import { getErrorMessage } from "@/service/function.ts";
 import { useToast } from "@/service/ui";
 import { IonButton, IonIcon } from "@ionic/react";
 import { downloadOutline } from "ionicons/icons";
@@ -34,7 +33,7 @@ export const ImportDatasetsButton: React.FC = () => {
 
   // Updates
   useEffect(() => {
-    if (datasetsToImportError) toast.presentError(getErrorMessage(datasetsToImportError));
+    if (datasetsToImportError) toast.presentError(datasetsToImportError);
   }, [ datasetsToImportError ]);
 
   // Methods
@@ -46,7 +45,7 @@ export const ImportDatasetsButton: React.FC = () => {
         refetchDatasets();
         setIsImportModalOpen(false);
       })
-      .catch(error => toast.presentError(getErrorMessage(error)))
+      .catch(error => toast.presentError(error));
   }
 
   function openImportModal() {

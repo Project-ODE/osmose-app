@@ -30,7 +30,7 @@ export const LabelSetModal: React.FC<{
   }, [ campaign?.labels_with_acoustic_features ]);
 
   useEffect(() => {
-    if (patchError) toast.presentError(getErrorMessage(patchError));
+    if (patchError) toast.presentError(patchError);
   }, [ patchError ]);
   useEffect(() => {
     if (isPatchSuccessful) toast.presentSuccess(`Labels successfully updated`);

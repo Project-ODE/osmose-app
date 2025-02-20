@@ -73,8 +73,8 @@ export const ProgressModal: React.FC<{
   }, [ fileRanges, users ]);
 
   useEffect(() => {
-    if (statusError) toast.presentError(getErrorMessage(statusError));
-    if (reportError) toast.presentError(getErrorMessage(reportError));
+    if (statusError) toast.presentError(statusError);
+    if (reportError) toast.presentError(reportError);
   }, [ statusError, reportError ]);
 
   function toggleAnnotatorSort() {

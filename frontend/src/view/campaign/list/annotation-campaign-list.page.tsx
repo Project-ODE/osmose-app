@@ -5,7 +5,6 @@ import { CampaignCard } from "@/view/campaign/list/campaign-card/campaign-card.c
 import styles from './annotation-campaign-list.module.scss'
 import { AnnotationCampaignUsage, useListCampaignsQuery } from '@/service/campaign';
 import { useToast } from "@/service/ui";
-import { getErrorMessage } from '@/service/function.ts';
 import { ActionBar } from "@/components/ActionBar/ActionBar.tsx";
 import { useGetCurrentUserQuery } from "@/service/user";
 
@@ -39,7 +38,7 @@ export const AnnotationCampaignList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (error) presentError(getErrorMessage(error));
+    if (error) presentError(error);
   }, [ error ]);
 
   const openNewCampaign = () => {

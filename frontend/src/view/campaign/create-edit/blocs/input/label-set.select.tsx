@@ -2,7 +2,6 @@ import React, { useEffect, useMemo } from "react";
 import { useToast } from "@/service/ui";
 import { Select } from "@/components/form";
 import { useListLabelSetQuery } from '@/service/campaign/label-set';
-import { getErrorMessage } from '@/service/function.ts';
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import {
   selectCampaignSubmissionErrors,
@@ -39,7 +38,7 @@ export const LabelSetSelect: React.FC = () => {
   }, [ allLabelSets ]);
 
   useEffect(() => {
-    if (labelSetListError) presentError(getErrorMessage(labelSetListError));
+    if (labelSetListError) presentError(labelSetListError);
   }, [ labelSetListError ]);
 
   useEffect(() => {

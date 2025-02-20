@@ -5,7 +5,6 @@ import { caretBack, caretForward } from "ionicons/icons";
 import { useAppSelector } from '@/service/app';
 import { useAnnotatorSubmitService } from "@/services/annotator/submit.service.ts";
 import { useAlert, useToast } from "@/service/ui";
-import { getErrorMessage } from '@/service/function.ts';
 import { Kbd, TooltipOverlay } from "@/components/ui";
 import styles from '../annotator-tools.module.scss'
 import { KEY_DOWN_EVENT } from "@/service/events";
@@ -78,7 +77,7 @@ export const NavigationButtons: React.FC = () => {
         history.push(`/annotation-campaign/${ campaignID }`)
       }
     } catch (e: any) {
-      toast.presentError(getErrorMessage(e))
+      toast.presentError(e)
     } finally {
       isSubmitting.current = false;
     }
