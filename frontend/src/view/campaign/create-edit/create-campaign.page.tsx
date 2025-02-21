@@ -24,6 +24,7 @@ import { usePostAnnotationFileRangeMutation } from '@/service/campaign/annotatio
 import { useImportResultMutation } from '@/service/campaign/result';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { useToast } from "@/service/ui";
+import { SpectrogramTuningBloc } from "./blocs/spectrogram-tuning";
 
 export const CreateCampaign: React.FC = () => {
   const toast = useToast();
@@ -86,6 +87,8 @@ export const CreateCampaign: React.FC = () => {
       datasets: draftCampaign.datasets ?? [],
       spectro_configs: draftCampaign.spectro_configs ?? [],
       labels_with_acoustic_features: draftCampaign.labels_with_acoustic_features ?? [],
+      allow_image_tuning: draftCampaign.allow_image_tuning ?? false,
+      allow_colormap_tuning: draftCampaign.allow_colormap_tuning ?? false,
     }
 
     if (draftCampaign.usage === 'Check') {
@@ -170,6 +173,8 @@ export const CreateCampaign: React.FC = () => {
       <CampaignBloc/>
 
       <DataBloc/>
+
+      <SpectrogramTuningBloc />
 
       <AnnotationBloc onFileImported={ setResultFile } onFileRemoved={ () => setResultFile(undefined) }/>
 

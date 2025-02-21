@@ -35,7 +35,12 @@ export const Input: React.FC<InputProperties> = ({
     else setType('password');
   }
 
-  return <div id="aplose-input" aria-disabled={ disabled } aria-invalid={ !!error }>
+  return <div
+    id="aplose-input"
+    aria-disabled={ disabled }
+    aria-invalid={ !!error }
+    className={ type === 'checkbox' ? "inline" : '' }
+  >
     { label && <label id="label"
                       className={ required ? 'required' : '' }>
       { label }{ required ? '*' : '' }

@@ -72,6 +72,8 @@ class AnnotationCampaign(models.Model):
     spectro_configs = models.ManyToManyField(
         "SpectrogramConfiguration", related_name="annotation_campaigns"
     )
+    allow_image_tuning = models.BooleanField(blank=False, default=False)
+    allow_colormap_tuning = models.BooleanField(blank=False, default=False)
     annotation_scope = models.IntegerField(
         choices=AnnotationScope.choices, default=AnnotationScope.WHOLE
     )

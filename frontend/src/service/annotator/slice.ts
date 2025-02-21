@@ -12,6 +12,7 @@ import { CampaignAPI } from "@/service/campaign";
 import { LabelSetAPI } from "@/service/campaign/label-set";
 import { UserAPI } from "@/service/user";
 import { ConfidenceSetAPI } from "@/service/campaign/confidence-set";
+import { COLORMAP_GREYS } from '@/services/utils/color.ts';
 
 function _focusTask(state: AnnotatorState) {
   state.focusedResultID = undefined;
@@ -37,10 +38,10 @@ export const AnnotatorSlice = createSlice({
       audioSpeed: 1,
       zoomLevel: 1,
       spectrogramConfigurationID: 1,
-      colormap: 'none',
+      colormap: COLORMAP_GREYS,
       colormapInverted: false,
-      brightness: 100,
-      contrast: 100,
+      brightness: 50,
+      contrast: 50,
     },
     audio: {
       isPaused: true,
@@ -276,6 +277,10 @@ export const AnnotatorSlice = createSlice({
     selectSpectrogramConfiguration: (state, { payload }: { payload: number }) => {
       state.userPreferences.spectrogramConfigurationID = payload;
       state.userPreferences.zoomLevel = 1;
+      state.userPreferences.colormap = COLORMAP_GREYS;
+      state.userPreferences.colormapInverted = false;
+      state.userPreferences.brightness = 50;
+      state.userPreferences.contrast = 50;
     },
     setColormap: (state, { payload }: { payload: string }) => {
       state.userPreferences.colormap = payload;

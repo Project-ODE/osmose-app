@@ -1,2 +1,2 @@
 name,nfft,window_size,overlap,zoom_level,desc,spectro_normalization,data_normalization,zscore_duration,hp_filter_min_freq,colormap,dynamic_min,dynamic_max,window_type,frequency_resolution,custom_frequency_scale
-4096_512_85,4096,512,0.85,8,Demo spectro config,density,0,0,0,Blues,0,0,Hamming,0,porp_delph
+4096_512_85,4096,512,0.85,8,Demo spectro config,density,0,0,0,Greys,0,0,Hamming,0,porp_delph

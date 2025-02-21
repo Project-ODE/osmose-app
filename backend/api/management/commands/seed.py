@@ -169,6 +169,13 @@ class Command(management.BaseCommand):
         dataset_names.append("porp_delph")
         dataset_names.append("dual_lf_hf")
         dataset_names.append("audible")
+        datasets_colormap = {
+            "Test Dataset": "Greys", # +3 viridis added manually below
+            "Test archived": "Greys",
+            "porp_delph": "viridis",
+            "dual_lf_hf": "Greys",
+            "audible": "yiorrd"
+        }
         for name in dataset_names:
             dataset = Dataset(
                 name=name,
@@ -193,7 +200,7 @@ class Command(management.BaseCommand):
                 end = start + timedelta(minutes=15)
                 files.append(
                     DatasetFile(
-                        filename=f"sound{k:03d}.wav",
+                        filename="50h_0.wav",
                         filepath="data/audio/50h_0.wav",
                         size=58982478,
                         start=(start + timedelta(hours=k)),
@@ -215,7 +222,7 @@ class Command(management.BaseCommand):
                     data_normalization="0",
                     zscore_duration="0",
                     hp_filter_min_freq=0,
-                    colormap="Blues",
+                    colormap=datasets_colormap[name],
                     dynamic_min=0,
                     dynamic_max=0,
                     window_type=self.window_type,
@@ -240,7 +247,7 @@ class Command(management.BaseCommand):
                         data_normalization="0",
                         zscore_duration="0",
                         hp_filter_min_freq=0,
-                        colormap="Blues",
+                        colormap="viridis",
                         dynamic_min=0,
                         dynamic_max=0,
                         window_type=self.window_type,
@@ -264,7 +271,7 @@ class Command(management.BaseCommand):
                         data_normalization="0",
                         zscore_duration="0",
                         hp_filter_min_freq=0,
-                        colormap="Blues",
+                        colormap="viridis",
                         dynamic_min=0,
                         dynamic_max=0,
                         window_type=self.window_type,
@@ -288,7 +295,7 @@ class Command(management.BaseCommand):
                         data_normalization="0",
                         zscore_duration="0",
                         hp_filter_min_freq=0,
-                        colormap="Blues",
+                        colormap="viridis",
                         dynamic_min=0,
                         dynamic_max=0,
                         window_type=self.window_type,

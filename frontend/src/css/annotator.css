@@ -117,7 +117,8 @@
 .workbench-controls {
     position: absolute;
     top: 10px;
-    left: 50px;
+    left: 30px;
+    padding: 0 10px;
     background-color: #ffffff;
     border-radius: 5px;
     display: flex;
@@ -135,7 +136,10 @@
 }
 
 .workbench-controls input[type=number] {
-    width: 50px;
+    width: 80px;
+}
+.workbench-controls input[type=range] {
+    width: 120px;
 }
 
 .workbench-controls > select {
@@ -150,7 +154,7 @@
 .workbench-pointer {
     position: absolute;
     top: 20px;
-    right: 270px;
+    right: 250px;
     transform: translateX(-50%);
     background-color: #ffffff;
     border-radius: 5px;
@@ -161,7 +165,7 @@
 .workbench-info {
     position: absolute;
     top: 10px;
-    right: 50px;
+    right: 30px;
     background-color: #ffffff;
     border-radius: 5px;
     padding: 5px 10px;

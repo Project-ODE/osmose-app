@@ -15,6 +15,7 @@ export const NFFTSelect: React.FC = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
+    // TODO: bug here ???
     if (!selectedID) return;
     const configs: SpectrogramConfiguration[] = spectrogram_configurations ?? [];
     if (configs.find(c => c.id === selectedID)) return;

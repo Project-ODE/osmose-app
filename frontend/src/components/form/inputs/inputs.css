@@ -11,6 +11,10 @@
     grid-column: 1 / -1;
 }
 
+#aplose-input.inline {
+    grid-template-columns: 1fr auto;
+}
+
 #aplose-input > #label {
     font-weight: 300;
     padding-left: 0.5rem;
@@ -158,6 +162,8 @@
     max-width: 20rem;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    gap: 1rem;
 }
 
 #aplose-input.select #inner-content {

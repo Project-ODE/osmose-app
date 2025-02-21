@@ -105,7 +105,7 @@ const mockState: AnnotatorState = {
     audioSpeed: 1,
     spectrogramConfigurationID: -1,
     zoomLevel: -1,
-    colormap: "none",
+    colormap: 'Greys',
     colormapInverted: false,
     brightness: 100,
     contrast: 100,

@@ -73,6 +73,11 @@
         > div {
           display: flex;
           flex-direction: row;
+          gap: 0.2rem;
+        }
+
+        input[type=range] {
+          width: 10rem;
         }
       }
 

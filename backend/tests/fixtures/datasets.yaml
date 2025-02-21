@@ -176,7 +176,7 @@
     data_normalization: 0
     zscore_duration: 0
     hp_filter_min_freq: 0
-    colormap: "Blues"
+    colormap: "Greys"
     dynamic_min: 0
     dynamic_max: 0
     window_type: 1
@@ -195,7 +195,7 @@
     data_normalization: 0
     zscore_duration: 0
     hp_filter_min_freq: 0
-    colormap: "Reds"
+    colormap: "Greys"
     dynamic_min: 0
     dynamic_max: 0
     window_type: 1
@@ -214,7 +214,7 @@
     data_normalization: 0
     zscore_duration: 0
     hp_filter_min_freq: 0
-    colormap: "Reds"
+    colormap: "Greys"
     dynamic_min: 0
     dynamic_max: 0
     window_type: 1

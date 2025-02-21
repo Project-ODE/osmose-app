@@ -135,7 +135,8 @@ export const Select: React.FC<SelectProperties> = ({
               aria-disabled={ disabled }
               disabled={ disabled }
               onClick={ () => !disabled && setIsOpen(!isOpen) }
-              className={ !value && !hasSelectedItem ? ' placeholder' : '' }>
+              className={ !value && !hasSelectedItem ? ' placeholder' : '' }
+              title={ buttonItem.label }>
         <p ref={ selectLabelRef }>{ buttonItem.img ? <img src={buttonItem.img} alt={buttonItem.label} /> : buttonItem.label }</p>
         <IonIcon ref={ iconRef } icon={ isOpen ? caretUp : caretDown }/>
       </button>
@@ -145,7 +146,7 @@ export const Select: React.FC<SelectProperties> = ({
           onValueSelected(v.value === -9 ? undefined : v.value)
           setHasSelectedItem(true)
           setIsOpen(false)
-        } } key={ v.value }>{ v.img ? <img src={v.img} alt={v.label} /> : v.label }</div>) }
+        } } key={ v.value }>{ v.img && <img src={v.img} alt={v.label} />} { v.label }</div>) }
       </div> }
 
       { optionsContainer === 'alert' && isOpen && <SelectModal header={ placeholder } options={ getOptions() } onClose={ option => {
