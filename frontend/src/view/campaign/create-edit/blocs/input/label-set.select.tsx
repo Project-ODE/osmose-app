@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect, useMemo } from "react";
-import { useToast } from "@/services/utils/toast.ts";
+import React, { useEffect, useMemo } from "react";
+import { useToast } from "@/service/ui";
 import { Select } from "@/components/form";
 import { useListLabelSetQuery } from '@/service/campaign/label-set';
 import { getErrorMessage } from '@/service/function.ts';
@@ -13,6 +13,7 @@ import {
   WriteCreateAnnotationCampaign
 } from '@/service/campaign';
 import { CampaignErrors } from '@/service/campaign/type.ts';
+import { LabelSetDisplay } from "@/components/campaign/label/LabelSet.tsx";
 
 export const LabelSetSelect: React.FC = () => {
 
@@ -47,6 +48,10 @@ export const LabelSetSelect: React.FC = () => {
     }
   }, [])
 
+  const onLabelsWithFeaturesUpdated = (value: string[]) => {
+    dispatch(updateDraftCampaign({ labels_with_acoustic_features: value }))
+  }
+
   return <Select label="Label set" placeholder="Select a label set"
                  required={ true }
                  error={ errors.label_set }
@@ -56,11 +61,10 @@ export const LabelSetSelect: React.FC = () => {
                  isLoading={ !allLabelSets }
                  disabled={ !!createdCampaign || !allLabelSets?.length }
                  onValueSelected={ value => dispatch(updateDraftCampaign({ label_set: value as number | undefined })) }>
-    { !!selectedLabelSet && (
-      <Fragment>
-        { selectedLabelSet.desc }
-        <p><span className="bold">Labels:</span> { selectedLabelSet.labels.join(', ') }</p>
-      </Fragment>)
-    }
+    { !!selectedLabelSet && (<LabelSetDisplay set={ selectedLabelSet }
+                                              allDisabled={ !!createdCampaign }
+                                              labelsWithAcousticFeatures={ draftCampaign.labels_with_acoustic_features ?? [] }
+                                              setLabelsWithAcousticFeatures={ onLabelsWithFeaturesUpdated }/>) }
+
   </Select>
 }

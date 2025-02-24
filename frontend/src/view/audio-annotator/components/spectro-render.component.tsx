@@ -16,14 +16,16 @@ import { XAxis } from "@/view/audio-annotator/components/spectrogram/x-axis.comp
 import { YAxis } from "@/view/audio-annotator/components/spectrogram/y-axis.component.tsx";
 import { useSpectrogramService } from "@/services/annotator/spectrogram.service.ts";
 import { usePointerService } from "@/services/annotator/pointer.service.ts";
-import { getFileDuration } from '@/service/dataset';
+import { getDuration } from '@/service/dataset';
 import { AnnotationResult, AnnotationResultBounds } from '@/service/campaign/result';
 import { addResult, leavePointerPosition, setPointerPosition, zoom } from '@/service/annotator';
-import { useToast } from '@/services/utils/toast.ts';
+import { useToast } from "@/service/ui";
 import { ScaleMapping } from '@/service/dataset/spectrogram-configuration/scale';
+import { MOUSE_DOWN_EVENT, MOUSE_MOVE_EVENT, MOUSE_UP_EVENT } from "@/service/events";
+import { useAnnotator } from "@/service/annotator/hook.ts";
+import { AcousticFeatures } from '@/view/annotator/tools/bloc/AcousticFeatures.tsx';
+import { SPECTRO_HEIGHT, SPECTRO_WIDTH } from '@/service/annotator/spectrogram';
 
-export const SPECTRO_HEIGHT: number = 512;
-export const SPECTRO_WIDTH: number = 1813;
 export const Y_WIDTH: number = 35;
 export const X_HEIGHT: number = 30;
 export const SCROLLBAR_RESERVED: number = 20;
@@ -38,10 +40,13 @@ export interface SpectrogramRender {
 }
 
 export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>(({ audioPlayer, }, ref) => {
+  const {
+    campaign,
+    annotatorData
+  } = useAnnotator();
 
   // Data
   const {
-    campaign,
     file,
     focusedLabel,
     results,
@@ -51,7 +56,7 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
     spectrogram_configurations
   } = useAppSelector(state => state.annotator)
   const dispatch = useAppDispatch()
-  const duration = useMemo(() => getFileDuration(file), [ file ])
+  const duration = useMemo(() => getDuration(file), [ file ])
 
   // Ref
   const containerRef = useRef<HTMLDivElement>(null)
@@ -75,7 +80,7 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
 
 
   // Is drawing enabled? (always in box mode, when a label is selected in presence mode)
-  const isDrawingEnabled = useMemo(() => campaign?.usage === 'Create' && !!focusedLabel, [ focusedLabel, campaign?.usage ]);
+  const isDrawingEnabled = useMemo<boolean>(() => campaign?.usage === 'Create' && !!focusedLabel && !!annotatorData?.is_assigned, [ focusedLabel, campaign?.usage, annotatorData?.is_assigned ]);
   const _isDrawingEnabled = useRef<boolean>(isDrawingEnabled)
   useEffect(() => {
     _isDrawingEnabled.current = isDrawingEnabled
@@ -208,9 +213,15 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
   }), [ canvasRef.current, xAxis.current, yAxis.current ])
 
   useEffect(() => {
-    document.addEventListener('mousedown', e => onStartNewAnnotation(e as any))
-    document.addEventListener('mousemove', e => onUpdateNewAnnotation(e as any))
-    document.addEventListener('mouseup', e => onEndNewAnnotation(e as any))
+    MOUSE_DOWN_EVENT.add(onStartNewAnnotation)
+    MOUSE_MOVE_EVENT.add(onUpdateNewAnnotation)
+    MOUSE_UP_EVENT.add(onEndNewAnnotation)
+
+    return () => {
+      MOUSE_DOWN_EVENT.remove(onStartNewAnnotation)
+      MOUSE_MOVE_EVENT.remove(onUpdateNewAnnotation)
+      MOUSE_UP_EVENT.remove(onEndNewAnnotation)
+    }
   }, []);
 
 
@@ -336,5 +347,6 @@ export const SpectroRenderComponent = React.forwardRef<SpectrogramRender, Props>
                   audioPlayer={ audioPlayer }/>
         )) }
       </div>
+      <AcousticFeatures/>
     </Fragment>)
 })

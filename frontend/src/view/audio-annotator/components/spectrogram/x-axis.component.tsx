@@ -20,7 +20,7 @@ export const XAxis = React.forwardRef<ScaleMapping, Omit<AxisProps, 'multi_linea
       width,
       max_value
     )
-  }, [max_value, width]);
+  }, [ max_value, width ]);
 
   const scale: ScaleMapping = useMemo(() => ({
     valueToPosition: scaleService.valueToPosition.bind(scaleService),
@@ -29,13 +29,13 @@ export const XAxis = React.forwardRef<ScaleMapping, Omit<AxisProps, 'multi_linea
     positionsToRange: scaleService.positionsToRange.bind(scaleService),
     isRangeContinuouslyOnScale: scaleService.isRangeContinuouslyOnScale.bind(scaleService),
     canvas: canvasRef.current ?? undefined
-  }), [scaleService, canvasRef.current])
+  }), [ scaleService, canvasRef.current ])
 
   useImperativeHandle(ref, (): ScaleMapping => scale)
 
   useEffect(() => {
     display()
-  }, [canvasRef, width]);
+  }, [ canvasRef, width ]);
 
   const getTimeSteps = () => {
     if (max_value <= 60) return { step: 1, bigStep: 5 }

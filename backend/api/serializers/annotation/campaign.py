@@ -2,22 +2,21 @@
 from datetime import datetime
 
 import pytz
-from django.db.models import Count, Sum
 from rest_framework import serializers
 
 from backend.api.models import (
     AnnotationCampaign,
     AnnotationCampaignUsage,
-    AnnotationTask,
     SpectrogramConfiguration,
     Dataset,
     LabelSet,
-    ConfidenceIndicatorSet,
     AnnotationCampaignArchive,
+    Label,
+    ConfidenceIndicatorSet,
 )
 from backend.aplose.models import User
 from backend.aplose.serializers import UserSerializer
-from backend.utils.serializers import EnumField
+from backend.utils.serializers import EnumField, SlugRelatedGetOrCreateField
 
 
 class AnnotationCampaignArchiveSerializer(serializers.ModelSerializer):
@@ -30,22 +29,28 @@ class AnnotationCampaignArchiveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class AnnotationCampaignBasicSerializer(serializers.ModelSerializer):
+class AnnotationCampaignSerializer(serializers.ModelSerializer):
     """Serializer for annotation campaign"""
 
-    files_count = serializers.SerializerMethodField(read_only=True)
+    files_count = serializers.IntegerField(read_only=True)
     datasets = serializers.SlugRelatedField(
         many=True, queryset=Dataset.objects.all(), slug_field="name"
     )
-    my_progress = serializers.SerializerMethodField(read_only=True)
+    my_progress = serializers.IntegerField(read_only=True)
     my_total = serializers.IntegerField(read_only=True)
-    progress = serializers.SerializerMethodField(read_only=True)
+    progress = serializers.IntegerField(read_only=True)
     total = serializers.IntegerField(read_only=True)
     usage = EnumField(enum=AnnotationCampaignUsage)
 
     label_set = serializers.PrimaryKeyRelatedField(
         queryset=LabelSet.objects.all(),
         required=False,
+    )
+    labels_with_acoustic_features = SlugRelatedGetOrCreateField(
+        queryset=Label.objects.all(),
+        slug_field="name",
+        required=False,
+        many=True,
     )
     confidence_indicator_set = serializers.PrimaryKeyRelatedField(
         queryset=ConfidenceIndicatorSet.objects.all(), required=False, allow_null=True
@@ -64,23 +69,6 @@ class AnnotationCampaignBasicSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnnotationCampaign
         fields = "__all__"
-
-    def get_files_count(self, campaign: AnnotationCampaign) -> int:
-        """Get dataset files cont"""
-        return campaign.datasets.annotate(count=Count("files")).aggregate(
-            total=Sum("count")
-        )["total"]
-
-    def get_progress(self, campaign: AnnotationCampaign) -> int:
-        """Get progress"""
-        return campaign.tasks.filter(status=AnnotationTask.Status.FINISHED).count()
-
-    def get_my_progress(self, campaign: AnnotationCampaign) -> int:
-        """Get current user progress"""
-        return campaign.tasks.filter(
-            annotator_id=self.context["request"].user.id,
-            status=AnnotationTask.Status.FINISHED,
-        ).count()
 
     def validate_create_usage(self, attrs: dict):
         """Validate attributes for a "create" usage creation"""
@@ -117,6 +105,24 @@ class AnnotationCampaignBasicSerializer(serializers.ModelSerializer):
         self.validate_spectro_configs_in_datasets(attrs)
         if attrs["usage"] == AnnotationCampaignUsage.CREATE:
             self.validate_create_usage(attrs)
+        if attrs["usage"] == AnnotationCampaignUsage.CHECK:
+            attrs["label_set"], _ = LabelSet.objects.get_or_create(
+                name=f"{attrs['name']} label set"
+            )
+        if "labels_with_acoustic_features" in attrs:
+            label_set: LabelSet = attrs["label_set"]
+            for label in attrs["labels_with_acoustic_features"]:
+                if not label_set.labels.filter(name=label).exists():
+                    if attrs["usage"] == AnnotationCampaignUsage.CREATE:
+                        message = (
+                            "Label with acoustic features should belong to label set"
+                        )
+                        raise serializers.ValidationError(
+                            {"labels_with_acoustic_features": message},
+                        )
+                    if attrs["usage"] == AnnotationCampaignUsage.CHECK:
+                        label_obj, _ = Label.objects.get_or_create(name=label)
+                        label_set.labels.add(label_obj)
         return attrs
 
     def create(self, validated_data):
@@ -125,3 +131,36 @@ class AnnotationCampaignBasicSerializer(serializers.ModelSerializer):
                 name=f"{validated_data['name']} label set"
             )
         return super().create(validated_data)
+
+
+class AnnotationCampaignPatchSerializer(serializers.Serializer):
+    """Serializer for annotation campaign"""
+
+    labels_with_acoustic_features = serializers.SlugRelatedField(
+        queryset=Label.objects.all(),
+        slug_field="name",
+        required=False,
+        many=True,
+    )
+
+    class Meta:
+        fields = "__all__"
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance: AnnotationCampaign, validated_data):
+        if "labels_with_acoustic_features" in validated_data:
+            label_set: LabelSet = instance.label_set
+            for label in validated_data["labels_with_acoustic_features"]:
+                if not label_set.labels.filter(name=label).exists():
+                    message = "Label with acoustic features should belong to label set"
+                    raise serializers.ValidationError(
+                        {"labels_with_acoustic_features": message},
+                    )
+
+        instance.labels_with_acoustic_features.set(
+            validated_data["labels_with_acoustic_features"]
+        )
+        instance.save()
+        return instance

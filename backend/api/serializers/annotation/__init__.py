@@ -1,7 +1,7 @@
 """
 DRF serializers module to be used in viewsets
 """
-from .campaign import AnnotationCampaignBasicSerializer
+from .campaign import AnnotationCampaignSerializer
 from .comment import AnnotationCommentSerializer
 from .confidence_indicator_set import (
     ConfidenceIndicatorSerializer,
@@ -16,5 +16,9 @@ from .file_range import (
     AnnotationFileRangeSerializer,
     AnnotationFileRangeFilesSerializer,
 )
-from .result import AnnotationResultSerializer, AnnotationResultImportListSerializer
+from .result import (
+    AnnotationResultSerializer,
+    AnnotationResultImportListSerializer,
+    AnnotationResultAcousticFeaturesSerializer,
+)
 from .session import AnnotationSessionSerializer

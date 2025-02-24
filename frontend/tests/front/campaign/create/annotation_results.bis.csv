@@ -1,4 +1,0 @@
-dataset,filename,start_time,end_time,start_frequency,end_frequency,annotation,annotator,start_datetime,end_datetime,is_box,confidence_indicator_label,confidence_indicator_level
-Test Dataset,sound001.wav,0,3599,0,120.0,Madagascan pygmy blue whale song,detector1,2012-10-03T11:00:00.000000+00:00,2012-10-03T11:15:00.000000+00:00,0,not confident,0/1
-Test Dataset,sound002.wav,800,3800,300,7000,Sri Lanka pygmy blue whale song,detector3,2012-10-03T11:00:00.000000+00:00,2012-10-03T12:15:00.000000+00:00,1,not confident,0/1
-Test Dataset,sound003.wav,0,3599,0,120,Sri Lanka pygmy blue whale song,detector3,2012-10-03T11:20:00.000000+00:00,2012-10-03T11:30:00.000000+00:00,0,not confident,0/1

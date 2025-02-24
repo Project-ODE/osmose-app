@@ -2,11 +2,16 @@ import { MutableRefObject, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import { AnnotationResult } from '@/service/campaign/result';
 import { setAudioSpeed, setStopTime, setTime } from '@/service/annotator';
-import { useToast } from '@/services/utils/toast.ts';
+import { useToast } from "@/service/ui";
+import { KEY_DOWN_EVENT } from "@/service/events";
 
 export const useAudioService = (player: MutableRefObject<HTMLAudioElement | null>) => {
   // Data
   const isPaused = useAppSelector(state => state.annotator.audio.isPaused);
+  const {
+    focusedResultID,
+    results
+  } = useAppSelector(state => state.annotator)
   const dispatch = useAppDispatch();
   const toast = useToast();
 
@@ -16,7 +21,22 @@ export const useAudioService = (player: MutableRefObject<HTMLAudioElement | null
     _isPaused.current = isPaused
   }, [ isPaused ]);
 
+  // Services
+  useEffect(() => {
+    KEY_DOWN_EVENT.add(onKbdEvent)
+    return () => {
+      KEY_DOWN_EVENT.remove(onKbdEvent)
+    }
+  }, []);
+
   // Methods
+
+  function onKbdEvent(event: KeyboardEvent) {
+    if (event.code === 'Space') {
+      event.preventDefault();
+      playPause(results?.find(r => r.id === focusedResultID));
+    }
+  }
 
   function seek(time: number | null) {
     if (!player.current || time === null) return;
@@ -25,11 +45,13 @@ export const useAudioService = (player: MutableRefObject<HTMLAudioElement | null
   }
 
   function play(annotation?: AnnotationResult) {
-    if (annotation && player.current) seek(annotation.start_time)
+    if (annotation && player.current) {
+      seek(annotation.start_time)
+      dispatch(setStopTime(annotation.end_time ?? undefined))
+    }
     player.current?.play().catch(e => {
       toast.presentError(`Audio failed playing: ${ e }`)
     });
-    if (annotation) dispatch(setStopTime(annotation.end_time ?? undefined))
   }
 
   function pause() {

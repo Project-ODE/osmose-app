@@ -1,5 +1,6 @@
 export type Token = string | undefined;
 
 export type AuthState = {
-  token: Token,
+  token: Token;
+  isNewUser: boolean;
 }

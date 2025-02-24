@@ -17,7 +17,7 @@ export const AuthAPI = createApi({
       }),
       transformResponse: (response: { access: Token }) => response.access,
     })
-  })
+  }),
 })
 
 

@@ -41,6 +41,7 @@ class AnnotationCampaignAdmin(admin.ModelAdmin):
         "instructions_url",
         "deadline",
         "label_set",
+        "show_labels_with_acoustic_features",
         "annotation_scope",
         "owner",
         "show_spectro_configs",
@@ -48,9 +49,12 @@ class AnnotationCampaignAdmin(admin.ModelAdmin):
         "confidence_indicator_set",
         "usage",
     )
-    search_fields = ("name", "desc")
+    search_fields = ("name", "desc", "datasets__name")
 
-    list_filter = ("datasets", "usage", IsArchivedFilter)
+    list_filter = (
+        "usage",
+        IsArchivedFilter,
+    )
 
     actions = [
         "archive",
@@ -99,14 +103,22 @@ class AnnotationCampaignAdmin(admin.ModelAdmin):
                 f"The following campaigns were not archived: {', '.join(not_archived_campaigns)}",
             )
 
+    @admin.display(description="Spectrogram configurations")
     def show_spectro_configs(self, obj):
         """show_spectro_configs"""
         return get_many_to_many(obj, "spectro_configs", "name")
 
+    @admin.display(description="Datasets")
     def show_datasets(self, obj):
         """show_datasets"""
         return get_many_to_many(obj, "datasets", "name")
 
+    @admin.display(description="Labels for acoustic features")
+    def show_labels_with_acoustic_features(self, obj):
+        """show_labels_with_acoustic_features"""
+        return get_many_to_many(obj, "labels_with_acoustic_features", "name")
+
+    @admin.display(description="Is archived")
     def is_archived(self, campaign: AnnotationCampaign) -> bool:
         """is_archived"""
         return campaign.archive is not None

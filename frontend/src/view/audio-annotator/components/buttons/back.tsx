@@ -1,14 +1,18 @@
 import React from "react";
 import { IonButton } from "@ionic/react";
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
-export const BackButton: React.FC<{ campaignID: string | number }> = ({ campaignID }) => {
+export const BackButton: React.FC = () => {
+  const {
+    campaignID,
+  } = useAnnotator();
 
   const open = () => {
-    window.open(`/app/annotation-campaign/${ campaignID }/file`, "_self")
+    window.open(`/app/annotation-campaign/${ campaignID }`, "_self")
   }
 
   const openAux = () => {
-    window.open(`/app/annotation-campaign/${ campaignID }/file`, "_blank")
+    window.open(`/app/annotation-campaign/${ campaignID }`, "_blank")
   }
 
   return <IonButton color="danger"

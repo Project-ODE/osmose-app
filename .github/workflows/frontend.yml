@@ -10,34 +10,8 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: "postgres"
-          POSTGRES_PASSWORD: "postgres"
-          POSTGRES_DB: "postgres"
-        ports:
-          - 5432:5432
     steps:
       - uses: actions/checkout@v4
-      # Setup server
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.9"
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pypoetry/
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-      - name: Install server dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install
-      - name: Setup DB
-        run: |
-          poetry run ./manage.py migrate
-          poetry run ./manage.py seed
       # Setup frontend
       - uses: actions/setup-node@v4
         with:

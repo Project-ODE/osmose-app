@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 from backend.utils.tests import AuthenticatedTestCase, empty_fixtures, all_fixtures
 
 URL = reverse("annotation-file-range-list")
+URL_files = reverse("annotation-file-range-campaign-files", kwargs={"campaign_id": 1})
 
 
 class ListUnauthenticatedTestCase(APITestCase):
@@ -39,14 +40,14 @@ class ListEmpyAdminAuthenticatedTestCase(AuthenticatedTestCase):
 
     def test_list_for_current_user_with_files(self):
         response = self.client.get(
-            URL,
+            URL_files,
             {
-                "for_current_user": True,
-                "with_files": True,
+                "page": 1,
+                "page_size": 100,
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data["results"]), 0)
 
 
 class ListFilledAdminAuthenticatedTestCase(AuthenticatedTestCase):
@@ -70,24 +71,19 @@ class ListFilledAdminAuthenticatedTestCase(AuthenticatedTestCase):
 
     def test_list_for_current_user_with_files(self):
         response = self.client.get(
-            URL,
+            URL_files,
             {
-                "for_current_user": True,
-                "with_files": True,
+                "page": 1,
+                "page_size": 100,
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
-
-        # First file range
-        self.assertEqual(response.data[0]["id"], 1)
-        self.assertEqual(response.data[0]["files_count"], 6)
-        self.assertEqual(len(response.data[0]["files"]), 6)
+        self.assertEqual(len(response.data["results"]), 6)
 
         # First file of first file range
-        self.assertEqual(response.data[0]["files"][0]["id"], 1)
-        self.assertEqual(response.data[0]["files"][0]["results_count"], 3)
-        self.assertEqual(response.data[0]["files"][0]["filename"], "sound001.wav")
+        self.assertEqual(response.data["results"][0]["id"], 1)
+        self.assertEqual(response.data["results"][0]["results_count"], 3)
+        self.assertEqual(response.data["results"][0]["filename"], "sound001.wav")
 
 
 class ListFilledCampaignOwnerAuthenticatedTestCase(AuthenticatedTestCase):
@@ -111,14 +107,14 @@ class ListFilledCampaignOwnerAuthenticatedTestCase(AuthenticatedTestCase):
 
     def test_list_for_current_user_with_files(self):
         response = self.client.get(
-            URL,
+            URL_files,
             {
-                "for_current_user": True,
-                "with_files": True,
+                "page": 1,
+                "page_size": 100,
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data["results"]), 0)
 
 
 class ListFilledBaseUserAuthenticatedTestCase(AuthenticatedTestCase):
@@ -142,21 +138,16 @@ class ListFilledBaseUserAuthenticatedTestCase(AuthenticatedTestCase):
 
     def test_list_for_current_user_with_files(self):
         response = self.client.get(
-            URL,
+            URL_files,
             {
-                "for_current_user": True,
-                "with_files": True,
+                "page": 1,
+                "page_size": 100,
             },
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
-
-        # First file range
-        self.assertEqual(response.data[0]["id"], 5)
-        self.assertEqual(response.data[0]["files_count"], 2)
-        self.assertEqual(len(response.data[0]["files"]), 2)
+        self.assertEqual(len(response.data["results"]), 4)
 
         # First file of first file range
-        self.assertEqual(response.data[0]["files"][0]["id"], 1)
-        self.assertEqual(response.data[0]["files"][0]["results_count"], 1)
-        self.assertEqual(response.data[0]["files"][0]["filename"], "sound001.wav")
+        self.assertEqual(response.data["results"][0]["id"], 7)
+        self.assertEqual(response.data["results"][0]["results_count"], 3)
+        self.assertEqual(response.data["results"][0]["filename"], "sound007.wav")

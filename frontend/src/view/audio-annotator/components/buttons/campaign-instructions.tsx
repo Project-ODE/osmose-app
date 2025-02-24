@@ -1,11 +1,12 @@
 import React, { Fragment } from "react";
 import { IonButton, IonIcon } from "@ionic/react";
 import { informationCircle } from "ionicons/icons";
-import { useAppSelector } from '@/service/app';
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 export const CampaignInstructionsButton: React.FC = () => {
-
-  const campaign = useAppSelector(state => state.annotator.campaign);
+  const {
+    campaign,
+  } = useAnnotator();
 
   const open = () => {
     if (!campaign?.instructions_url) return;

@@ -2,11 +2,11 @@ export {
   AnnotationFileRangeAPI,
   useListAnnotationFileRangeQuery,
   usePostAnnotationFileRangeMutation,
-  useListAnnotationFileRangeWithFilesQuery,
+  useListFilesWithPaginationQuery,
+  FILES_PAGE_SIZE
 } from './api';
 
 export type {
   AnnotationFileRange,
-  AnnotationFileRangeWithFiles,
   WriteAnnotationFileRange
 } from './type';

@@ -1,0 +1,115 @@
+.page {
+  display: grid;
+  font-family: var(--ion-font-family), sans-serif;
+
+  .banner {
+    width: 100%;
+    height: 8rem;
+    object-fit: cover;
+  }
+
+  .content {
+    display: grid;
+    padding: 2rem 4rem;
+    justify-content: center;
+    gap: 8rem;
+
+    @media (max-width: 800px) {
+      padding: 2rem 1rem;
+      gap: 4rem;
+    }
+
+    .bloc {
+      display: grid;
+      gap: 1rem;
+      max-width: 80ch;
+
+      h2 {
+        text-align: center;
+        color: var(--ion-color-primary);
+        padding: 0 2rem;
+      }
+
+      p {
+        text-align: justify;
+      }
+
+      video, img {
+        width: 100%;
+      }
+
+      .links {
+        display: flex;
+        gap: 0.5rem 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+
+        &.collaborators {
+          gap: 1rem;
+          justify-items: center;
+          justify-content: center;
+
+          img {
+            height: 6rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+.carouselContainer {
+  cursor: pointer;
+  display: grid;
+  align-items: center;
+
+  .carousel {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    overflow: hidden;
+    position: relative;
+    align-items: center;
+
+    .previousBtn, .nextBtn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .previousBtn {
+      left: 1rem;
+    }
+
+    .nextBtn {
+      right: 1rem;
+    }
+
+    img {
+      width: 100%;
+      object-fit: contain;
+      transition: 300ms ease-out;
+    }
+  }
+
+  &.modal {
+    position: fixed;
+    top: 5rem; // Header
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--aplose-backdrop-color);
+    display: grid;
+    padding: 8rem 16rem;
+    z-index: 1;
+
+    @media (max-width: 800px) {
+      padding: 1rem;
+    }
+
+    img {
+      cursor: auto;
+    }
+  }
+}

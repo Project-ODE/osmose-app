@@ -2,13 +2,14 @@ import React, { Fragment } from "react";
 import { useAppSelector } from '@/service/app';
 import { IonButton, IonIcon } from "@ionic/react";
 import { downloadOutline } from "ionicons/icons";
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 export const AudioDownloadButton: React.FC = () => {
-
   const {
-    file,
-    user
-  } = useAppSelector(state => state.annotator);
+    user,
+  } = useAnnotator();
+
+  const file = useAppSelector(state => state.annotator.file);
 
   const download = () => {
     if (!file?.audio_url) return;

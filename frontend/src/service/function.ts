@@ -7,8 +7,9 @@ export function encodeQueryParams(queryParams?: QueryParams): string {
   return encodeURI(`?${ Object.entries(queryParams).map(([ key, value ]) => `${ key }=${ value }`).join('&') }`);
 }
 
-export function getErrorMessage(error: FetchBaseQueryError | SerializedError | undefined): string | undefined {
+export function getErrorMessage(error: FetchBaseQueryError | SerializedError | string | undefined): string | undefined {
   if (!error) return undefined;
+  if (typeof error === 'string') return error;
   if ((error as SerializedError).message) return (error as SerializedError).message;
   if ((error as FetchBaseQueryError).status === 500) return '[500] Internal server error';
   const data = (error as FetchBaseQueryError).data as any;
@@ -45,7 +46,7 @@ function downloadFile(filename: string, type: string, text: string) {
 export async function downloadResponseHandler(response: Response) {
   // TODO: reject errors correctly (catchable) - like a standard API error
   if (response.status !== 200) return `[${ response.status }] ${ response.statusText }`;
-  const filenameRegExp = /filename=([a-zA-Z_.]*)/.exec(response.url)
+  const filenameRegExp = /filename=([a-zA-Z_1-9.]*)/.exec(response.url)
   if (!filenameRegExp || filenameRegExp.length < 2) throw new Error("No filename provided");
   const filename = filenameRegExp[1];
   const type = response.headers.get('content-type')

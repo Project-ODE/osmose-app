@@ -99,6 +99,57 @@ class CreateAdminAuthenticatedTestCase(AuthenticatedTestCase):
             list(campaign.spectro_configs.values_list("id", flat=True)), [1]
         )
 
+    def test_create_create_usage_with_empty_acoustic_features(self):
+        old_count = AnnotationCampaign.objects.count()
+        response = self.client.post(
+            URL, {**creation_data, "labels_with_acoustic_features": []}, format="json"
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(AnnotationCampaign.objects.count(), old_count + 1)
+        self.assertEqual(len(response.data["labels_with_acoustic_features"]), 0)
+
+    def test_create_create_usage_with_filled_valid_acoustic_features(self):
+        old_count = AnnotationCampaign.objects.count()
+        response = self.client.post(
+            URL,
+            {**creation_data, "labels_with_acoustic_features": ["Mysticetes"]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(AnnotationCampaign.objects.count(), old_count + 1)
+        self.assertEqual(len(response.data["labels_with_acoustic_features"]), 1)
+        self.assertEqual(
+            response.data["labels_with_acoustic_features"][0], "Mysticetes"
+        )
+
+    def test_create_create_usage_with_filled_invalid_acoustic_features(self):
+        old_count = AnnotationCampaign.objects.count()
+        response = self.client.post(
+            URL,
+            {**creation_data, "labels_with_acoustic_features": ["Invalid"]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(AnnotationCampaign.objects.count(), old_count)
+        self.assertEqual(
+            response.data["labels_with_acoustic_features"][0].code, "invalid"
+        )
+
+    def test_create_create_usage_with_filled_invalid_in_set_acoustic_features(self):
+        old_count = AnnotationCampaign.objects.count()
+        response = self.client.post(
+            URL,
+            {**creation_data, "labels_with_acoustic_features": ["Dcall"]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(AnnotationCampaign.objects.count(), old_count)
+        self.assertEqual(
+            response.data["labels_with_acoustic_features"][0].code, "invalid"
+        )
+
     def test_double_create_create_usage(self):
         old_count = AnnotationCampaign.objects.count()
         response_1 = self.client.post(URL, creation_data, format="json")

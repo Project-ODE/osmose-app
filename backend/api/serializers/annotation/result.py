@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
+from django.db import transaction
 from django.db.models import QuerySet
 from rest_framework import serializers
 from rest_framework.fields import empty
@@ -20,13 +21,17 @@ from backend.api.models import (
     ConfidenceIndicatorSet,
     AnnotationCampaignUsage,
     ConfidenceIndicatorSetIndicator,
+    AnnotationResultAcousticFeatures,
+    SignalTrend,
 )
 from backend.aplose.models import User
-from backend.utils.serializers import ListSerializer, SlugRelatedGetOrCreateField
-from .comment import AnnotationCommentSerializer
-from .confidence_indicator_set import (
-    ConfidenceIndicatorSerializer,
+from backend.utils.serializers import (
+    ListSerializer,
+    SlugRelatedGetOrCreateField,
+    EnumField,
 )
+from .comment import AnnotationCommentSerializer
+from .confidence_indicator_set import ConfidenceIndicatorSerializer
 
 
 def to_seconds(delta: timedelta) -> float:
@@ -102,7 +107,7 @@ class AnnotationResultImportSerializer(serializers.Serializer):
         end = attrs["end_datetime"]
         dataset_files = dataset.get_files(start, end)
         if not dataset_files:
-            if self.context["force"]:
+            if "force" in self.context and self.context["force"]:
                 return None
             raise serializers.ValidationError(
                 "This start and end datetime does not belong to any file of the dataset",
@@ -155,6 +160,7 @@ class AnnotationResultImportSerializer(serializers.Serializer):
                 campaign.confidence_indicator_set = self.get_confidence_set(
                     name=f"{campaign.name} confidence set"
                 )
+                campaign.save()
             confidence_indicator, _ = ConfidenceIndicator.objects.get_or_create(
                 label=validated_data["confidence_indicator"].get("label"),
                 level=validated_data["confidence_indicator"].get("level"),
@@ -165,6 +171,7 @@ class AnnotationResultImportSerializer(serializers.Serializer):
                 confidence_indicator_set=campaign.confidence_indicator_set,
                 is_default=is_default or False,
             )
+
         if not is_box and files.count() == 1:
             return AnnotationResult.objects.create(
                 annotation_campaign=campaign,
@@ -188,23 +195,46 @@ class AnnotationResultImportSerializer(serializers.Serializer):
             else:
                 end_time = to_seconds(end - file.start)
 
-            instances.append(
-                AnnotationResult(
-                    annotation_campaign=campaign,
-                    detector_configuration=detector_config,
-                    label=label,
-                    confidence_indicator=confidence_indicator,
-                    dataset_file=file,
-                    start_frequency=validated_data["min_frequency"]
-                    if "min_frequency" in validated_data and is_box
-                    else 0,
-                    end_frequency=validated_data["max_frequency"]
-                    if "max_frequency" in validated_data and is_box
-                    else dataset.audio_metadatum.dataset_sr / 2,
-                    start_time=start_time,
-                    end_time=end_time,
-                )
+            start_frequency = (
+                validated_data["min_frequency"]
+                if "min_frequency" in validated_data and is_box
+                else 0
             )
+            end_frequency = (
+                validated_data["max_frequency"]
+                if "max_frequency" in validated_data and is_box
+                else dataset.audio_metadatum.dataset_sr / 2
+            )
+
+            if (
+                start_time == 0
+                and end_time == to_seconds(file.end - file.start)
+                and start_frequency == 0
+                and end_frequency == dataset.audio_metadatum.dataset_sr / 2
+            ):
+                instances.append(
+                    AnnotationResult(
+                        annotation_campaign=campaign,
+                        detector_configuration=detector_config,
+                        label=label,
+                        confidence_indicator=confidence_indicator,
+                        dataset_file=file,
+                    )
+                )
+            else:
+                instances.append(
+                    AnnotationResult(
+                        annotation_campaign=campaign,
+                        detector_configuration=detector_config,
+                        label=label,
+                        confidence_indicator=confidence_indicator,
+                        dataset_file=file,
+                        start_frequency=start_frequency,
+                        end_frequency=end_frequency,
+                        start_time=start_time,
+                        end_time=end_time,
+                    )
+                )
 
         return AnnotationResult.objects.bulk_create(instances)
 
@@ -264,6 +294,16 @@ class DetectorConfigurationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class AnnotationResultAcousticFeaturesSerializer(serializers.ModelSerializer):
+    """AnnotationResultAcousticFeatures serializer"""
+
+    trend = EnumField(enum=SignalTrend, allow_null=True, allow_blank=True)
+
+    class Meta:
+        model = AnnotationResultAcousticFeatures
+        fields = "__all__"
+
+
 class AnnotationResultSerializer(serializers.ModelSerializer):
     """Annotation result serializer for annotator"""
 
@@ -312,6 +352,9 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
     )
     comments = AnnotationCommentSerializer(many=True, required=False)
     validations = AnnotationResultValidationSerializer(many=True, required=False)
+    acoustic_features = AnnotationResultAcousticFeaturesSerializer(
+        allow_null=True, required=False
+    )
 
     class Meta:
         model = AnnotationResult
@@ -334,7 +377,7 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
             )
             if campaign.confidence_indicator_set is not None:
                 fields["confidence_indicator"] = serializers.SlugRelatedField(
-                    queryset=campaign.confidence_indicator_set.confidence_indicators,
+                    queryset=campaign.confidence_indicator_set.confidence_indicators.all(),
                     slug_field="label",
                     required=True,
                     allow_null=False,
@@ -368,7 +411,7 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
 
         return fields
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict):
         # Reorder start/end
         start_time = attrs.get("start_time")
         end_time = attrs.get("end_time")
@@ -382,8 +425,27 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
         ):
             attrs["start_frequency"] = end_frequency
             attrs["end_frequency"] = start_frequency
+        campaign: Optional[AnnotationCampaign] = (
+            self.context["campaign"] if "campaign" in self.context else None
+        )
+        if (
+            campaign is not None
+            and campaign.usage == AnnotationCampaignUsage.CHECK
+            and "annotator" in attrs
+        ):
+            attrs.pop("annotator")
+        detector_configuration = attrs.get("detector_configuration")
+        if detector_configuration is not None:
+            (
+                attrs["detector_configuration"],
+                _,
+            ) = DetectorConfiguration.objects.get_or_create(
+                detector_id=detector_configuration["detector"].id,
+                configuration=detector_configuration["configuration"],
+            )
         return super().validate(attrs)
 
+    @transaction.atomic
     def create(self, validated_data):
         comments = AnnotationCommentSerializer(
             validated_data.pop("comments", []), many=True
@@ -391,7 +453,8 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
         validations = AnnotationResultValidationSerializer(
             validated_data.pop("validations", []), many=True
         ).data
-        instance = super().create(validated_data)
+        initial_acoustic_features = validated_data.pop("acoustic_features", None)
+        instance: AnnotationResult = super().create(validated_data)
 
         # Comments
         comments_serializer = AnnotationCommentSerializer(
@@ -408,21 +471,30 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
         validations_serializer.is_valid(raise_exception=True)
         validations_serializer.save()
 
+        # Acoustic features
+        if initial_acoustic_features is not None:
+            acoustic_features = AnnotationResultAcousticFeaturesSerializer(
+                initial_acoustic_features
+            ).data
+            acoustic_features_serializer = AnnotationResultAcousticFeaturesSerializer(
+                data={**acoustic_features, "annotation_result": instance.id},
+            )
+            acoustic_features_serializer.is_valid(raise_exception=True)
+            acoustic_features_serializer.save()
+            instance.acoustic_features = acoustic_features_serializer.instance
+            instance.save()
+
         return instance
 
-    def update(self, instance, validated_data):
+    @transaction.atomic
+    def update(self, instance: AnnotationResult, validated_data):
         comments = AnnotationCommentSerializer(
             validated_data.pop("comments", []), many=True
         ).data
         validations = AnnotationResultValidationSerializer(
             validated_data.pop("validations", []), many=True
         ).data
-
-        initial_detector_config = validated_data.get("detector_configuration", None)
-        if initial_detector_config is not None:
-            validated_data[
-                "detector_configuration"
-            ] = DetectorConfiguration.objects.filter(**initial_detector_config).first()
+        initial_acoustic_features = validated_data.pop("acoustic_features", None)
 
         if hasattr(instance, "first") and callable(getattr(instance, "first")):
             instance = instance.first()
@@ -458,5 +530,22 @@ class AnnotationResultSerializer(serializers.ModelSerializer):
         )
         validations_serializer.is_valid(raise_exception=True)
         validations_serializer.save()
+
+        # acoustic_features
+        if initial_acoustic_features is None:
+            if instance.acoustic_features is not None:
+                instance.acoustic_features.delete()
+        else:
+            acoustic_features = AnnotationResultAcousticFeaturesSerializer(
+                initial_acoustic_features
+            ).data
+            acoustic_features_serializer = AnnotationResultAcousticFeaturesSerializer(
+                instance.acoustic_features,
+                data={**acoustic_features, "annotation_result": instance.id},
+            )
+            acoustic_features_serializer.is_valid(raise_exception=True)
+            acoustic_features_serializer.save()
+            instance.acoustic_features = acoustic_features_serializer.instance
+            instance.save()
 
         return self.Meta.model.objects.get(pk=instance.id)

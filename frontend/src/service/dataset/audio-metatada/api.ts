@@ -21,7 +21,7 @@ export const AudioMetadataAPI = createApi({
     download: builder.mutation<void, AnnotationCampaign>({
       query: ({ id, name }) => ({
         url: `export/${ encodeQueryParams({
-          filename: name.replace(' ', '_') + '_audio_metadata.csv',
+          filename: name.replaceAll(' ', '_') + '_audio_metadata.csv',
           dataset__annotation_campaigns: id
         }) }`,
         responseHandler: downloadResponseHandler

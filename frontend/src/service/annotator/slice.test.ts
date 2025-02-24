@@ -15,14 +15,10 @@ import {
 } from "./slice";
 import { AnnotationResult, AnnotationResultBounds } from '@/service/campaign/result';
 import { AnnotatorState } from '@/service/annotator/type.ts';
-import { User } from '@/service/user';
 import { AnnotationComment } from '@/service/campaign/comment';
 
 const mockState: AnnotatorState = {
   hasChanged: false,
-  user: {
-    id: 1,
-  } as User,
   results: [
     {
       "id": 1,
@@ -35,6 +31,7 @@ const mockState: AnnotatorState = {
       "end_time": null,
       "start_frequency": null,
       "end_frequency": null,
+      acoustic_features: null,
       "comments": [
         {
           "id": 1568,
@@ -64,6 +61,7 @@ const mockState: AnnotatorState = {
       "end_time": 331.0,
       "start_frequency": 8179.0,
       "end_frequency": 11593.0,
+      acoustic_features: null,
       "comments": [
         {
           "id": 1569,
@@ -80,18 +78,6 @@ const mockState: AnnotatorState = {
   ],
   focusedResultID: undefined,
 
-  label_set: {
-    "id": 1,
-    "name": "Test SPM campaign",
-    "desc": "Label set made for Test SPM campaign",
-    "labels": [
-      "Mysticetes",
-      "Odoncetes",
-      "Boat",
-      "Rain",
-      "Other"
-    ]
-  },
   labelColors: {
     Mysticetes: "#00b1b9",
     Odoncetes: "#a23b72",
@@ -101,25 +87,6 @@ const mockState: AnnotatorState = {
   },
   focusedLabel: undefined,
 
-  confidence_set: {
-    "id": 1,
-    "name": "Confident/NotConfident",
-    "desc": "Occur box voice student night argue wind. Play street let buy life offer situation. Term perhaps final give something cut cover. Article ready whose call black purpose. Everybody under we generation service week hold produce. Kid put language.",
-    "confidence_indicators": [
-      {
-        "id": 2,
-        "label": "confident",
-        "level": 1,
-        "is_default": true
-      },
-      {
-        "id": 1,
-        "label": "not confident",
-        "level": 0,
-        "is_default": false
-      }
-    ]
-  },
   focusedConfidenceLabel: "confident",
 
   focusedCommentID: 1,
@@ -139,9 +106,7 @@ const mockState: AnnotatorState = {
     spectrogramConfigurationID: -1,
     zoomLevel: -1
   },
-  ui: {
-    areShortcutsEnabled: true,
-  },
+  ui: {},
   audio: {
     time: 0,
     isPaused: true
@@ -181,7 +146,8 @@ describe("Filled state - not focused result", () => {
       annotator: -1,
       annotation_campaign: -1,
       dataset_file: -1,
-      detector_configuration: null
+      detector_configuration: null,
+      acoustic_features: null,
     }
     const focusedResult = response.results?.find(r => r.id === response.focusedResultID);
     expect(focusedResult).toEqual(expectedNewResult);
@@ -239,7 +205,7 @@ describe("Filled state - not focused result", () => {
   })
 
   test("Should add presence", () => {
-    const response = AnnotatorSlice.reducer(previousState, addPresenceResult(newPresence));
+    const response = AnnotatorSlice.reducer(previousState, addPresenceResult({ label: newPresence }));
     const expectedNewResult: AnnotationResult = {
       id: -1,
       start_frequency: null,
@@ -253,7 +219,8 @@ describe("Filled state - not focused result", () => {
       annotator: -1,
       annotation_campaign: -1,
       dataset_file: -1,
-      detector_configuration: null
+      detector_configuration: null,
+      acoustic_features: null,
     }
     const focusedResult = response.results?.find(r => r.id === response.focusedResultID);
     expect(focusedResult).toEqual(expectedNewResult);

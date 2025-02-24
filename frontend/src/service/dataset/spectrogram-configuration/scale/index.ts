@@ -2,8 +2,8 @@ export {
   formatTime,
 } from './function'
 
-export { LinearScaleService } from './linear.service'
-export { MultiLinearScaleService } from './multi-linear.service'
+export { LinearScaleService } from '../../../annotator/spectrogram/scale/linear.service.ts'
+export { MultiLinearScaleService } from '../../../annotator/spectrogram/scale/multi-linear.service.ts'
 
 export type {
   AbstractScale,

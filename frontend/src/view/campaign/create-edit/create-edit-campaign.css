@@ -1,57 +1,83 @@
 #create-campaign-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4rem;
-  color: var(--ion-color-dark);
-  font-family: var(--ion-font-family);
-  padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+    color: var(--ion-color-dark);
+    font-family: var(--ion-font-family), sans-serif;
+    padding: 0 2rem 1rem;
+    min-height: 0;
+    max-height: 100%;
+    overflow: auto;
 }
+
+#create-campaign-form > h1 {
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+
 #create-campaign-form > * {
-  width: min(100%, 40rem);
+    width: min(100%, 40rem);
 }
 
 #create-campaign-form .title {
-  text-align: center;
+    text-align: center;
 }
 
 #create-campaign-form .chips-container {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
+
 #create-campaign-form .chips-container:has(*) {
-  padding: 0.5rem 0;
+    padding: 0.5rem 0;
 }
+
 #create-campaign-form .center {
-  justify-self: center;
+    justify-self: center;
 }
+
 #create-campaign-form #detector-import-results {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0 1rem;
-  align-items: center;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 1rem;
+    align-items: center;
 }
+
 #create-campaign-form #detector-import-results ion-label,
 #create-campaign-form #detector-import-results ion-note {
-  grid-column: 1 / 3;
+    grid-column: 1 / 3;
 }
 
 
 #create-campaign-form ion-note {
-  padding-left: 1rem;
-  padding-right: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 
 #create-campaign-form #import-button {
-  position: relative;
-}
-#create-campaign-form #import-button .hide-real-input {
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0;
+    position: relative;
 }
 
+#create-campaign-form #import-button .hide-real-input {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+}
+
+
+@media (max-width: 800px) {
+    #create-campaign-form {
+        padding: 0 1rem;
+    }
+
+    #create-campaign-form h1 {
+        text-align: center;
+    }
+}

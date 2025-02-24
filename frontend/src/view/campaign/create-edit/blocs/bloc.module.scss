@@ -8,9 +8,21 @@
     width: 6rem;
     text-align: end;
 
+    @media (max-width: 800px) {
+      width: 3rem;
+      padding: 0.25rem 0.5rem !important;
+    }
+
     &[aria-invalid=true] {
       box-shadow: inset 0 0 0 2px var(--ion-color-danger);
       background: rgba(var(--ion-color-danger-rgb), 0.1) !important;
     }
   }
+}
+
+.annotatorButton {
+  --padding-bottom: 0.25rem;
+  --padding-top: 0.25rem;
+  --padding-start: 0.5rem;
+  --padding-end: 0.5rem;
 }

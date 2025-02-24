@@ -4,7 +4,14 @@ import { IonButton, IonIcon, IonNote } from "@ionic/react";
 import { cloudUploadOutline, trashOutline } from "ionicons/icons";
 import { ImportModal } from "@/view/campaign/create-edit/blocs/import-modal/import-modal.component.tsx";
 import { ChipsInput } from "@/components/form";
-import { clearImport, selectCurrentCampaign, selectDraftCampaign, setFilteredDetectors } from '@/service/campaign';
+import {
+  clearImport,
+  selectCurrentCampaign,
+  selectDraftCampaign,
+  setFilteredDetectors,
+  updateDraftCampaign
+} from '@/service/campaign';
+import { LabelSetDisplay } from "@/components/campaign/label/LabelSet.tsx";
 
 export const CheckAnnotationsInputs: React.FC<{
   onFileImported: (file: File) => void,
@@ -19,6 +26,7 @@ export const CheckAnnotationsInputs: React.FC<{
     isSubmitted: areResultsSubmitted,
     detectors,
     filterDetectors,
+    fileData
   } = useAppSelector(state => state.campaign.resultImport)
   const [ isModalOpen, setIsModalOpen ] = useState<boolean>(false);
 
@@ -29,17 +37,17 @@ export const CheckAnnotationsInputs: React.FC<{
     for (const d of detectors ?? []) {
       const displayName = d.knownDetector?.name ?? d.initialName;
       if (shownDetectors[displayName]) shownDetectors[displayName].push(d.initialName);
-      else shownDetectors[displayName] = [d.initialName];
+      else shownDetectors[displayName] = [ d.initialName ];
     }
     return shownDetectors;
   }, [ detectors ])
   const selectedDetectors = useMemo(() => {
     if (!filterDetectors) return [];
     return Object.entries(allDetectors).filter(e => e[1].some(d => filterDetectors.includes(d)))
-  }, [detectors, filterDetectors])
+  }, [ detectors, filterDetectors ])
 
   const onDetectorsChange = (array: Array<string | number>) => {
-    dispatch(setFilteredDetectors([...new Set(Object.entries(allDetectors).filter(e => array.includes(e[0])).flatMap(e => e[1]))]))
+    dispatch(setFilteredDetectors([ ...new Set(Object.entries(allDetectors).filter(e => array.includes(e[0])).flatMap(e => e[1])) ]))
   }
 
   const openImportModal = () => {
@@ -51,6 +59,9 @@ export const CheckAnnotationsInputs: React.FC<{
     onFileRemoved()
   }
 
+  const onLabelsWithFeaturesUpdated = (value: string[]) => {
+    dispatch(updateDraftCampaign({ labels_with_acoustic_features: value }))
+  }
 
   return (
     <Fragment>
@@ -79,20 +90,33 @@ export const CheckAnnotationsInputs: React.FC<{
                                           onFileImported={ onFileImported }/> }
 
 
-      { !!detectors?.length && <div id="detector-import-results">
-          <ChipsInput label="Detectors"
-                      disabled={ areResultsSubmitted }
-                      required={ true }
-                      items={ Object.entries(allDetectors).map(([displayName]) => ({ value: displayName, label: displayName })) }
-                      activeItemsValues={ selectedDetectors.map(e => e[0]) }
-                      setActiveItemsValues={ onDetectorsChange }/>
+      { !!detectors?.length && <Fragment>
+          <div id="detector-import-results">
+              <ChipsInput label="Detectors"
+                          disabled={ areResultsSubmitted }
+                          required={ true }
+                          items={ Object.entries(allDetectors).map(([ displayName ]) => ({
+                            value: displayName,
+                            label: displayName
+                          })) }
+                          activeItemsValues={ selectedDetectors.map(e => e[0]) }
+                          setActiveItemsValues={ onDetectorsChange }/>
 
-          <IonButton color="danger"
-                     disabled={ areResultsSubmitted }
-                     onClick={ deleteDetectors }>
-              <IonIcon icon={ trashOutline } slot="icon-only"/>
-          </IonButton>
-      </div> }
+              <IonButton color="danger"
+                         disabled={ areResultsSubmitted }
+                         onClick={ deleteDetectors }>
+                  <IonIcon icon={ trashOutline } slot="icon-only"/>
+              </IonButton>
+          </div>
+          <LabelSetDisplay set={ {
+            labels: fileData?.labels ?? [],
+            name: `${ draftCampaign.name } label set`,
+            id: -1,
+            desc: undefined
+          } }
+                           labelsWithAcousticFeatures={ draftCampaign.labels_with_acoustic_features ?? [] }
+                           setLabelsWithAcousticFeatures={ onLabelsWithFeaturesUpdated }/>
+      </Fragment> }
 
       {/*{ error && <IonNote color="danger">error</IonNote> }*/ }
     </Fragment>
