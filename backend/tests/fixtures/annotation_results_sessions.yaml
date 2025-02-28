@@ -79,8 +79,8 @@
 - model: api.annotationresult
   pk: 7
   fields:
-    start_time: 108.21842250413678
-    end_time: 224.87589630446772
+    start_time: 108.2
+    end_time: 224.8
     start_frequency: 7520.0
     end_frequency: 13696.0
     label: 2
@@ -115,11 +115,12 @@
     annotation_campaign: 1
     confidence_indicator: 2
     dataset_file: 1
+    acoustic_features: 1
 - model: api.annotationresult
   pk: 10
   fields:
-    start_time: 108.21842250413678
-    end_time: 224.87589630446772
+    start_time: 108.2
+    end_time: 224.8
     start_frequency: 7520.0
     end_frequency: 13696.0
     label: 4
@@ -196,8 +197,8 @@
     end: 2022-01-24 15:12:43+00:00
     session_output:
       annotations:
-      - end_time: 224.87589630446772
-        start_time: 108.21842250413678
+      - end_time: 224.8
+        start_time: 108.2
         end_frequency: 13696.0
         start_frequency: 7520.0
         label_id: 2
@@ -214,3 +215,13 @@
       task_end_time: 1643037163
       task_start_time: 1643037155
     annotation_task: 1
+- model: api.annotationresultacousticfeatures
+  pk: 1
+  fields:
+    start_frequency: 200
+    end_frequency: 150
+    relative_max_frequency_count: 3
+    relative_min_frequency_count: 2
+    has_harmonics: False
+    trend: FLAT
+    steps_count:

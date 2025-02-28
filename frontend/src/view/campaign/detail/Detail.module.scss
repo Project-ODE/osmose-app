@@ -1,0 +1,105 @@
+.page {
+  font-family: var(--ion-font-family), sans-serif;
+  display: grid;
+  grid-template-columns: 1fr minmax(auto, 12rem);
+  gap: 2rem;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  max-height: 100%;
+
+  h2 {
+    word-break: break-word;
+    text-align: center;
+    margin-bottom: 0 !important;
+  }
+
+  .main {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+    grid-template-rows: auto auto auto 1fr;
+    min-height: 0;
+    max-height: 100%;
+
+    .header {
+      display: grid;
+      align-items: center;
+      justify-items: center;
+    }
+  }
+
+  .side {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+    grid-template-rows: repeat(5, auto) 1fr;
+    font-size: 0.9rem;
+
+    .bloc {
+      display: grid;
+      gap: 0.5rem;
+      width: 100%;
+      overflow: hidden;
+
+      > div {
+        width: 100%;
+        overflow: hidden;
+      }
+    }
+
+    p {
+      line-height: 0.95rem;
+      word-break: break-word;
+      text-wrap: wrap;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    ion-button {
+      min-height: 1rem;
+    }
+  }
+
+
+  .filesTable {
+    row-gap: 0.25rem;
+    max-height: 100%;
+    align-self: start;
+    overflow: auto;
+
+    .filteredTableHead {
+      grid-auto-flow: column;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .statusIcon {
+      justify-self: center;
+      z-index: -1;
+    }
+
+    .fillContent {
+      grid-column: 1 / -1;
+    }
+
+    .submit {
+      --padding-top: 0.12rem !important;
+      --padding-bottom: 0.12rem !important;
+    }
+  }
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+}
+
+.filterModal {
+  overflow: visible !important;
+
+  > * {
+    overflow: visible !important;
+  }
+}

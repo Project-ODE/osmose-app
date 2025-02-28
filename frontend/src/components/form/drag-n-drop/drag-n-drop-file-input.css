@@ -8,6 +8,11 @@
   gap: 1rem;
   align-items: center;
   transition: 300ms;
+  max-width: 100%;
+  overflow: hidden;
+
+  text-wrap: wrap;
+  word-wrap: break-word;
 }
 
 #drag-n-drop-zone.available {
@@ -37,9 +42,21 @@
   padding: 0.5rem;
 }
 
+#drag-n-drop-zone.file-loaded > p {
+  max-width: 100%;
+  overflow: hidden;
+
+  text-wrap: wrap;
+  word-wrap: break-word;
+}
+
 #drag-n-drop-zone.dragging {
   height: 100%;
   cursor: pointer;
   background: rgba(var(--ion-color-primary-rgb), 0.25);
 }
 
+@media (max-width: 800px) {
+  #drag-n-drop-zone {
+  }
+}

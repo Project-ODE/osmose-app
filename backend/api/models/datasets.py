@@ -79,7 +79,8 @@ class Dataset(models.Model):
             start__lte=end,
             end__gte=end,
         )
-        return dataset_files_start | dataset_files_while | dataset_files_end
+        result = dataset_files_start | dataset_files_while | dataset_files_end
+        return result.order_by("start")
 
 
 class DatasetFile(models.Model):

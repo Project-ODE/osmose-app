@@ -1,0 +1,71 @@
+.listPage {
+  font-family: var(--ion-font-family), sans-serif;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  justify-items: center;
+  gap: 1rem;
+  overflow: hidden;
+  max-height: 100%;
+
+  .importButton {
+    z-index: 2;
+  }
+
+  .table {
+    overflow: auto;
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
+
+.importModal {
+  grid-template-rows: auto auto 1fr auto;
+
+  .tableContainer {
+    overflow: auto;
+  }
+
+  .importModalTable {
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    > * {
+      width: 100%;
+      overflow: hidden;
+    }
+  }
+
+  .item {
+    display: grid;
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: 1rem;
+    align-items: center;
+    font-weight: normal;
+
+    text-align: start;
+    cursor: pointer;
+    width: 100%;
+    overflow: hidden;
+
+    span, p {
+      width: 100%;
+      overflow: hidden;
+      text-wrap: wrap;
+      word-break: break-word;
+      font-weight: 300;
+    }
+
+    b {
+      font-weight: 500;
+    }
+  }
+}
+
+.buttons {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}

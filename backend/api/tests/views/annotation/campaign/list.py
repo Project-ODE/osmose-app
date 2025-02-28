@@ -66,7 +66,7 @@ class ListFilledBaseUserAuthenticatedTestCase(AuthenticatedTestCase):
         self.assertEqual(len(response.data), 3)
         self.assertEqual(response.data[0]["name"], "Test DCLDE LF campaign")
         self.assertEqual(response.data[1]["name"], "Test SPM campaign")
-        self.assertEqual(response.data[1]["my_total"], 5)
+        self.assertEqual(response.data[1]["my_total"], 4)
 
 
 class ListFilledBaseUserNoCampaignAuthenticatedTestCase(AuthenticatedTestCase):

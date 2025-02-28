@@ -1,0 +1,75 @@
+/* Annotation colors */
+
+.ion-color-0 {
+    --ion-color-base: #00b1b9;
+    --ion-color-shade: #00b1b9;
+    --ion-color-base-rgb: 0, 177, 185;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-1 {
+    --ion-color-base: #a23b72;
+    --ion-color-shade: #a23b72;
+    --ion-color-base-rgb: 162, 59, 114;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-2 {
+    --ion-color-base: #f18f01;
+    --ion-color-shade: #f18f01;
+    --ion-color-base-rgb: 241, 143, 1;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-3 {
+    --ion-color-base: #c73e1d;
+    --ion-color-shade: #c73e1d;
+    --ion-color-base-rgb: 199, 62, 29;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-4 {
+    --ion-color-base: #bb7e5d;
+    --ion-color-shade: #bb7e5d;
+    --ion-color-base-rgb: 187, 126, 93;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-5 {
+    --ion-color-base: #eac435;
+    --ion-color-shade: #eac435;
+    --ion-color-base-rgb: 234, 196, 53;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-6 {
+    --ion-color-base: #98ce00;
+    --ion-color-shade: #98ce00;
+    --ion-color-base-rgb: 152, 206, 0;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-7 {
+    --ion-color-base: #2a2d34;
+    --ion-color-shade: #2a2d34;
+    --ion-color-base-rgb: 42, 45, 52;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-8 {
+    --ion-color-base: #6761a8;
+    --ion-color-shade: #6761a8;
+    --ion-color-base-rgb: 103, 97, 168;
+    --ion-color-contrast: #000000;
+}
+
+.ion-color-9 {
+    --ion-color-base: #009b72;
+    --ion-color-shade: #009b72;
+    --ion-color-base-rgb: 0, 155, 114;
+    --ion-color-contrast: #000000;
+}
+
+kbd[class^=ion-color-] {
+    background-color: rgba(var(--ion-color-base-rgb), 0.15);
+}

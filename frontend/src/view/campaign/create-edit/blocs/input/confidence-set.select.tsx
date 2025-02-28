@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useMemo } from "react";
-import { useToast } from "@/services/utils/toast.ts";
+import { useToast } from "@/service/ui";
 import { Select } from "@/components/form";
 import { IonNote } from '@ionic/react';
 import { useListConfidenceSetQuery } from '@/service/campaign/confidence-set';

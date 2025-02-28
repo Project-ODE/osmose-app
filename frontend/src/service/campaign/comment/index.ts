@@ -1,8 +1,2 @@
-export {
-  mapCommentForWriting
-} from './function'
-
-export type {
-  AnnotationComment,
-  WriteAnnotationComment,
-} from './type'
+export * from './function'
+export type * from './type'

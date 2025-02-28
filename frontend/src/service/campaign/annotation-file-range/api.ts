@@ -1,8 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { getAuthenticatedBaseQuery } from '@/service/auth/function.ts';
-import { ID } from '@/service/type.ts';
-import { AnnotationFileRange, AnnotationFileRangeWithFiles, WriteAnnotationFileRange } from './type.ts';
+import { ID, Paginated } from '@/service/type.ts';
+import { AnnotationFile, AnnotationFileRange, WriteAnnotationFileRange } from './type.ts';
 import { encodeQueryParams } from '@/service/function.ts';
+import { FileFilters } from "@/service/ui/type.ts";
+import { getQueryParamsForFilters } from "@/service/campaign/annotation-file-range/function.ts";
+
+export const FILES_PAGE_SIZE = 20;
 
 export const AnnotationFileRangeAPI = createApi({
   reducerPath: 'fileRangeApi',
@@ -20,19 +24,22 @@ export const AnnotationFileRangeAPI = createApi({
         return encodeQueryParams(params);
       },
     }),
-    listWithFiles: builder.query<Array<AnnotationFileRangeWithFiles>, {
-      campaignID?: ID,
-      forCurrentUser?: boolean,
+    listFilesWithPagination: builder.query<Paginated<AnnotationFile> & { resume?: number }, {
+      page: number,
+      filters: FileFilters
     }>({
-      query: ({ campaignID, forCurrentUser }) => {
-        const params: any = { with_files: true }
-        if (campaignID) params.annotation_campaign = campaignID;
-        if (forCurrentUser) params.for_current_user = true;
-        return encodeQueryParams(params);
-      },
+      query: ({ page, filters },) => `campaign/${ filters.campaignID }/files/${ encodeQueryParams({
+        page,
+        page_size: FILES_PAGE_SIZE,
+        ...getQueryParamsForFilters(filters)
+      }) }`,
     }),
 
-    post: builder.mutation<Array<AnnotationFileRange>, { campaignID: ID, data: Array<WriteAnnotationFileRange>, force?: boolean }>({
+    post: builder.mutation<Array<AnnotationFileRange>, {
+      campaignID: ID,
+      data: Array<WriteAnnotationFileRange>,
+      force?: boolean
+    }>({
       query: ({ campaignID, data, force }) => ({
         url: `campaign/${ campaignID }/`,
         method: 'POST',
@@ -44,6 +51,6 @@ export const AnnotationFileRangeAPI = createApi({
 
 export const {
   useListQuery: useListAnnotationFileRangeQuery,
-  useListWithFilesQuery: useListAnnotationFileRangeWithFilesQuery,
+  useListFilesWithPaginationQuery,
   usePostMutation: usePostAnnotationFileRangeMutation,
 } = AnnotationFileRangeAPI;

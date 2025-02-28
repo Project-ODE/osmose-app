@@ -1,0 +1,37 @@
+.actionBar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "search action"
+  "filters empty";
+  align-items: center;
+  gap: 0.5rem;
+
+  .search {
+    justify-self: start;
+    grid-area: search;
+    width: auto;
+  }
+
+  .filters {
+    grid-area: filters;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+    grid-template-areas: "action" "search" "filters";
+    gap: 1rem;
+    justify-items: center;
+
+    .search {
+      width: 100%;
+    }
+
+    .filters {
+      justify-content: center;
+    }
+  }
+}

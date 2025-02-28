@@ -2,7 +2,8 @@ import React from "react";
 import { IonChip, IonIcon, IonNote } from "@ionic/react";
 import { closeCircle } from "ionicons/icons";
 import { Item } from "@/types/item.ts";
-import './inputs.css';
+import styles from './inputs.module.scss'
+import { Label } from "@/components/form/inputs/Label.tsx";
 
 type ChipsProperties = {
   label?: string;
@@ -27,15 +28,13 @@ export const ChipsInput: React.FC<ChipsProperties> = ({
   const deactivateChip = (chip: Item) => setActiveItemsValues(activeItemsValues.filter(v => v !== chip.value))
   const activateChip = (chip: Item) => setActiveItemsValues([ ...activeItemsValues, chip.value ])
 
-  return <div id="aplose-input" className="chips" aria-disabled={ disabled } aria-invalid={ !!error }>
-    { label && <p id="label"
-                  className={ required ? 'required' : '' }>
-      { label }{ required ? '*' : '' }
-    </p> }
+  return <div id="aplose-input" className={ [ styles.default, styles.chips ].join(' ') } aria-disabled={ disabled }
+              aria-invalid={ !!error }>
+    <Label required={ required } label={ label }/>
 
-    <div id="input">
+    <div className={ styles.input }>
       <input required={ required }
-             className="hide-real-input"
+             className={ styles.realInput }
              value={ activeItemsValues.join('') }
              onChange={ () => {
              } }/>

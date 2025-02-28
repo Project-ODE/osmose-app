@@ -11,11 +11,9 @@ export interface AnnotationFileRange {
   finished_tasks_count: number; // read only
 }
 
-export type AnnotationFileRangeWithFiles = AnnotationFileRange & {
-  files: Array<DatasetFile & {
-    is_submitted: boolean; // read only
-    results_count: number; // read only
-  }>; // read only
+export type AnnotationFile = DatasetFile & {
+  is_submitted: boolean; // read only
+  results_count: number; // read only
 }
 
 export type WriteAnnotationFileRange =

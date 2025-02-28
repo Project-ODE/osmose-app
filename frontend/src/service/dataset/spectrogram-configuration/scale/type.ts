@@ -40,5 +40,6 @@ export type AxisProps = {
   linear_scale?: LinearScale | null,
   multi_linear_scale?: MultiLinearScale | null,
   max_value: number,
-  style: any
+  style?: any,
+  className?: string
 }

@@ -14,4 +14,5 @@ export const DEFAULT_PRESENCE_RESULT: AnnotationResult = {
   dataset_file: -1,
   annotator: -1,
   annotation_campaign: -1,
+  acoustic_features: null
 }

@@ -64,8 +64,8 @@ def datawork_import(*, wanted_datasets, importer):
         audio_metadatum = AudioMetadatum.objects.create(
             channel_count=audio_raw["channel_count"],
             dataset_sr=audio_raw["dataset_sr"],
-            start=parse_datetime(audio_raw["start_date"]),
-            end=parse_datetime(audio_raw["end_date"]),
+            start=parse_datetime(audio_raw["start_date"].strip()),
+            end=parse_datetime(audio_raw["end_date"].strip()),
             audio_file_count=audio_raw["audio_file_count"]
             if "audio_file_count" in audio_raw
             else None,

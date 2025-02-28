@@ -1,37 +1,43 @@
-import React, { useImperativeHandle, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { TooltipComponent } from "../tooltip.component.tsx";
 import { DEFAULT_COLOR } from "@/consts/colors.const.tsx";
 import { AlphanumericKeys } from "@/consts/shorcuts.const.tsx";
 import Tooltip from "react-bootstrap/Tooltip";
 import { confirm } from "@/view/global-components";
-import { KeypressHandler } from "../../audio-annotator.page.tsx";
 import { useAppDispatch, useAppSelector } from '@/service/app';
-import {
-  addPresenceResult,
-  disableShortcuts,
-  enableShortcuts,
-  focusLabel,
-  getPresenceLabels,
-  removePresence
-} from '@/service/annotator';
+import { addPresenceResult, focusLabel, getPresenceLabels, removePresence } from '@/service/annotator';
+import { disableShortcuts, enableShortcuts, KEY_DOWN_EVENT } from "@/service/events";
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 
-export const PresenceBloc = React.forwardRef<KeypressHandler, any>((_, ref) => {
+export const PresenceBloc: React.FC = () => {
+  const {
+    label_set,
+  } = useAnnotator();
 
   const {
-    ui,
-    label_set,
     results,
     focusedLabel,
     labelColors
   } = useAppSelector(state => state.annotator);
   const dispatch = useAppDispatch()
 
+  const _focused = useRef<string | undefined>(focusedLabel);
+  useEffect(() => {
+    _focused.current = focusedLabel;
+  }, [ focusedLabel ]);
   const presenceLabels = useMemo(() => getPresenceLabels(results), [ results ]);
 
-  const handleKeyPressed = (event: KeyboardEvent) => {
-    if (!ui.areShortcutsEnabled || !label_set) return;
+  useEffect(() => {
+    KEY_DOWN_EVENT.add(onKbdEvent);
+    return () => {
+      KEY_DOWN_EVENT.remove(onKbdEvent);
+    }
+  }, []);
+
+  function onKbdEvent(event: KeyboardEvent) {
+    if (!label_set) return;
     const active_alphanumeric_keys = AlphanumericKeys[0].slice(0, label_set.labels.length);
 
     if (event.key === "'") {
@@ -42,16 +48,13 @@ export const PresenceBloc = React.forwardRef<KeypressHandler, any>((_, ref) => {
       if (event.key !== AlphanumericKeys[0][i] && event.key !== AlphanumericKeys[1][i]) continue;
 
       const calledLabel = label_set.labels[i];
-      if (presenceLabels.includes(calledLabel) && focusedLabel !== calledLabel) {
-        dispatch(focusLabel(calledLabel))
-      } else toggle(calledLabel);
+      if (_focused.current === calledLabel) continue;
+      if (!presenceLabels.includes(calledLabel)) {
+        dispatch(addPresenceResult({ label: calledLabel, focus: false }));
+      }
+      dispatch(focusLabel(calledLabel))
     }
   }
-
-  useImperativeHandle(ref,
-    () => ({ handleKeyPressed }),
-    [ ui.areShortcutsEnabled, label_set?.labels ]
-  );
 
   const toggle = async (label: string) => {
     if (presenceLabels.includes(label)) {
@@ -66,7 +69,7 @@ export const PresenceBloc = React.forwardRef<KeypressHandler, any>((_, ref) => {
       dispatch(removePresence(label));
     } else {
       // Add presence
-      dispatch(addPresenceResult(label));
+      dispatch(addPresenceResult({ label }));
     }
   }
 
@@ -95,4 +98,4 @@ export const PresenceBloc = React.forwardRef<KeypressHandler, any>((_, ref) => {
       </div>
     </div>
   )
-})
+}

@@ -1,6 +1,6 @@
 {
   "name": "osmose",
-  "version": "1.12.11",
+  "version": "2.0.0-3",
   "scripts": {
     "database:remove": "docker stop devdb && docker rm devdb",
     "database:create": "docker run --name osmose_dev_db -e POSTGRES_PASSWORD=postgres -p 127.0.0.1:5432:5432 -d postgis/postgis",

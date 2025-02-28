@@ -3,9 +3,6 @@ export const ACCEPT_CSV_SEPARATOR = ',';
 export const IMPORT_ANNOTATIONS_COLUMNS = {
   required: [
     'dataset',
-    'filename',
-    'start_time',
-    'end_time',
     'start_frequency',
     'end_frequency',
     'start_datetime',

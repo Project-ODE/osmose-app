@@ -21,6 +21,7 @@ class AnnotationFileRangeAdmin(admin.ModelAdmin):
         "annotator__first_name",
         "annotator__last_name",
     )
+    list_filter = ("annotation_campaign", "annotator")
 
 
 @admin.register(AnnotationTask)

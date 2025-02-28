@@ -1,0 +1,220 @@
+.bloc {
+  border: 1px solid rgba(var(--ion-color-medium-rgb), 0.15) !important;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  display: grid;
+  align-self: start;
+  background: white;
+  grid-template-rows: auto 1fr;
+
+  .header, .footer {
+    background: var(--ion-color-light-shade);
+    text-align: center;
+    padding: 0.5rem;
+    border: none !important;
+    border-bottom: 1px solid rgba(var(--ion-color-medium-rgb), 0.15) !important;
+    position: initial;
+
+    &h6, h6 {
+      margin: 0;
+    }
+  }
+
+  .footer {
+    padding: unset;
+
+  }
+
+  .body {
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    &.center {
+      justify-content: center;
+    }
+
+    &.small, &.comment {
+      padding: 0.5rem 1rem;
+      gap: 0.5rem;
+    }
+
+    &.comment {
+      padding: 0.5rem;
+
+      .removeButton {
+        align-self: center;
+      }
+    }
+
+    &.vertical, &.comment {
+      flex-direction: column;
+    }
+
+    &.empty {
+      justify-self: center;
+    }
+
+    &.currentAnnotation {
+      display: grid;
+      justify-items: start;
+      align-items: center;
+    }
+
+    &.currentAnnotation {
+      gap: 0.5rem;
+      grid-template-columns: auto 1fr;
+    }
+
+    p {
+      display: grid;
+      grid-auto-flow: column;
+      justify-content: start;
+      align-items: center;
+      gap: 0.25rem;
+    }
+  }
+}
+
+ion-chip.active {
+  background: var(--ion-color-base);
+  color: var(--ion-color-contrast);
+}
+
+.item {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: start;
+
+  p {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &:not(.active) {
+    opacity: 0.5;
+  }
+
+  &.presenceLabel {
+    grid-column: 1 / 4;
+  }
+
+  &.strongLabel p {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+  }
+}
+
+
+.features {
+  position: absolute !important;
+  overflow: hidden;
+  user-select: none;
+  z-index: 2;
+  display: grid;
+
+  h6 {
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .body {
+    overflow: auto;
+    display: grid;
+    grid-auto-flow: row;
+    gap: 1rem;
+
+    .table {
+      overflow: visible;
+
+      .span2ColsStart {
+        grid-column: 1 / 3;
+      }
+
+      .span2ColsEnd {
+        grid-column: 2 / 4;
+      }
+
+      .frequencyCell {
+        grid-row: 3 / 12;
+      }
+
+      .trendCell {
+        grid-row: 15 / 26
+      }
+
+      .cell, .dualCell, .cellButton {
+        display: grid;
+        align-items: center;
+        gap: 0.5rem;
+        justify-items: start;
+      }
+
+      .dualCell {
+        grid-template-columns: 1fr 1fr 2ch;
+      }
+
+      .cell {
+        grid-template-columns: 1fr 2ch;
+      }
+
+      .cellButton {
+        grid-template-columns: 1fr 2ch auto;
+      }
+    }
+  }
+
+  .line {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  ion-note {
+    text-align: start;
+  }
+
+  .switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    justify-items: stretch;
+    background: var(--ion-color-light-shade);
+    border-radius: 0.5rem;
+    overflow: hidden;
+
+    > * {
+      padding: 0.25rem 0.5rem;
+      text-align: center;
+    }
+
+    .active {
+      background: var(--ion-color-primary);
+      color: var(--ion-color-primary-contrast);
+    }
+  }
+
+  ion-button {
+    transition: 150ms ease-in-out;
+  }
+
+  .selectedButton {
+    border-radius: 0.5rem;
+    box-shadow: var(--aplose-box-shadow);
+  }
+}
+
+.activeLabel {
+  background: var(--ion-color-base);
+  color: white;
+}

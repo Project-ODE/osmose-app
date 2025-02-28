@@ -9,14 +9,17 @@ import { RiRobot2Fill } from 'react-icons/ri';
 import { AnnotationResult } from '@/service/campaign/result';
 import { focusResult, getResultType, invalidateResult, ResultType, validateResult } from '@/service/annotator';
 import { formatTime } from '@/service/dataset/spectrogram-configuration/scale';
+import { useParams } from "react-router-dom";
+import { useRetrieveCampaignQuery } from "@/service/campaign";
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 
 export const ResultList: React.FC = () => {
-
   const {
     campaign,
-    results
-  } = useAppSelector(state => state.annotator);
+  } = useAnnotator();
+
+  const results = useAppSelector(state => state.annotator.results);
 
   const sorted_results: Array<AnnotationResult> = useMemo(
     () => {
@@ -32,6 +35,7 @@ export const ResultList: React.FC = () => {
 
   return <div className={ [
     styles.results,
+    'results',
     campaign?.usage === 'Check' ? styles.check : '',
     'mt-2', 'shadow-double', 'border__black--125'
   ].join(' ') }>
@@ -125,10 +129,13 @@ const ResultCommentInfo: React.FC<ResultItemProps> = ({ result, isActive, onClic
 )
 
 const ResultValidationButton: React.FC<ResultItemProps> = ({ result, isActive, onClick }) => {
-  const { campaign } = useAppSelector(state => state.annotator);
+  const { campaignID } = useParams<{ campaignID: string, fileID: string }>();
+  const { data: campaign } = useRetrieveCampaignQuery(campaignID)
+
   const dispatch = useAppDispatch();
   const validation = useMemo(() => {
-    return result.validations.length > 0 ? result.validations[0].is_valid : null
+    if (result.validations.length === 0) return true;
+    else return result.validations[0].is_valid;
   }, [ result.validations ]);
 
   const onValidate = (event: MouseEvent) => {

@@ -7,6 +7,11 @@ import { ID } from '@/service/type.ts';
 import { AnnotatorAPI } from './api.ts';
 import { AnnotationComment } from '@/service/campaign/comment';
 import { getNewItemID } from '@/service/function';
+import { AcousticFeatures } from '@/service/campaign/result/type.ts';
+import { CampaignAPI } from "@/service/campaign";
+import { LabelSetAPI } from "@/service/campaign/label-set";
+import { UserAPI } from "@/service/user";
+import { ConfidenceSetAPI } from "@/service/campaign/confidence-set";
 
 function _focusTask(state: AnnotatorState) {
   state.focusedResultID = undefined;
@@ -37,11 +42,10 @@ export const AnnotatorSlice = createSlice({
       isPaused: true,
       time: 0,
     },
-    ui: {
-      areShortcutsEnabled: true
-    },
+    ui: {},
     labelColors: {},
-    sessionStart: Date.now()
+    sessionStart: Date.now(),
+    didSeeAllFile: false,
   } satisfies AnnotatorState as AnnotatorState,
   reducers: {
     focusResult: _focusResult,
@@ -57,14 +61,38 @@ export const AnnotatorSlice = createSlice({
         comments: [],
         validations: [],
         confidence_indicator: state.focusedConfidenceLabel ?? null,
-        label: state.focusedLabel ?? getPresenceLabels(state.results)!.pop()!
+        label: state.focusedLabel ?? getPresenceLabels(state.results)!.pop()!,
+        acoustic_features: null,
       }
       if (!state.results) state.results = [];
       state.results.push(newResult);
       state.hasChanged = true;
       _focusResult(state, { payload: newResult.id })
     },
-    addPresenceResult: (state, { payload }: { payload: string }) => {
+    updateFocusResultBounds: (state, { payload }: { payload: AnnotationResultBounds }) => {
+      if (!state.focusedResultID) return;
+      if (!state.results) state.results = [];
+      state.results = state.results.map(r => {
+        if (r.id !== state.focusedResultID) return r;
+        return {
+          ...r,
+          ...payload
+        }
+      });
+      state.hasChanged = true;
+      _focusResult(state, { payload: state.focusedResultID })
+    },
+    addPresenceResult: (state, { payload }: {
+      payload: {
+        label: string,
+        focus?: boolean
+      }
+    }) => {
+      const existingPresence = state.results?.find(r => r.label === payload.label && getResultType(r) === 'presence')
+      if (existingPresence) {
+        if (payload.focus) _focusResult(state, { payload: existingPresence.id })
+        return
+      }
       const newResult: AnnotationResult = {
         id: getNewItemID(state.results),
         annotator: -1,
@@ -74,15 +102,17 @@ export const AnnotatorSlice = createSlice({
         comments: [],
         validations: [],
         confidence_indicator: state.focusedConfidenceLabel ?? null,
-        label: payload,
+        label: payload.label,
         end_frequency: null,
         end_time: null,
         start_time: null,
         start_frequency: null,
+        acoustic_features: null,
       }
       if (!state.results) state.results = [];
       state.results.push(newResult);
       state.hasChanged = true;
+      if (payload.focus === false) return;
       _focusResult(state, { payload: newResult.id })
     },
     removeResult: (state, { payload }: { payload: number }) => {
@@ -100,19 +130,18 @@ export const AnnotatorSlice = createSlice({
     },
     removePresence: (state, { payload }: { payload: string }) => {
       const presenceResult = state.results!.find(r => r.label === payload && getResultType(r) === 'presence');
-      if (!presenceResult) return _focusTask(state);
-      state.hasChanged = true;
-      state.results = state.results!.filter(r => r.label !== presenceResult.label);
-      return _focusTask(state);
+      if (presenceResult) {
+        state.hasChanged = true;
+        state.results = state.results!.filter(r => r.label !== presenceResult.label);
+      }
+      _focusTask(state);
     },
     focusLabel: (state, { payload }: { payload: string }) => {
       state.focusedLabel = payload;
       const result = state.results?.find(r => r.id === state.focusedResultID);
       if (!result) return;
       const type = getResultType(result);
-      if (type === 'presence') {
-        _focusTask(state);
-      } else {
+      if (type !== 'presence') {
         state.results = state.results?.map(r => {
           if (r.id !== state.focusedResultID) return r;
           return {
@@ -122,6 +151,11 @@ export const AnnotatorSlice = createSlice({
         })
         state.hasChanged = true;
       }
+    },
+    focusPresence: (state, { payload }: { payload: string }) => {
+      const result = state.results?.find(r => r.label === payload && getResultType(r) === 'presence');
+      if (result) _focusResult(state, { payload: result.id })
+      else _focusTask(state)
     },
     focusConfidence: (state, { payload }: { payload: string }) => {
       state.focusedConfidenceLabel = payload;
@@ -137,10 +171,10 @@ export const AnnotatorSlice = createSlice({
         const newComment: AnnotationComment = {
           comment: payload,
           annotation_result: state.focusedResultID ?? null,
-          annotation_campaign: state.campaign?.id ?? -1,
+          annotation_campaign: state.campaignID ?? -1,
           dataset_file: state.file?.id ?? -1,
           id: getNewItemID([ ...(state.results ?? []).flatMap(r => r.comments), ...(state.task_comments ?? []) ]),
-          author: state.user?.id ?? -1
+          author: state.userID ?? -1
         };
         if (newComment.annotation_result) {
           state.results = state.results?.map(r => {
@@ -192,9 +226,9 @@ export const AnnotatorSlice = createSlice({
         if (r.id === payload ||
           (type !== 'presence' && r.label === result.label && getResultType(r) === 'presence')) {
           let validations = r.validations;
-          if (validations.find(v => v.annotator === state.user?.id)) {
+          if (validations.find(v => v.annotator === state.userID)) {
             validations = validations.map(v => {
-              if (v.annotator !== state.user?.id) return v;
+              if (v.annotator !== state.userID) return v;
               return {
                 ...v,
                 is_valid: true
@@ -202,7 +236,7 @@ export const AnnotatorSlice = createSlice({
             })
           } else validations.push({
             id: getNewItemID(state.results?.flatMap(r => r.validations) ?? []),
-            annotator: state.user?.id ?? -1,
+            annotator: state.userID ?? -1,
             is_valid: true,
             result: r.id
           })
@@ -220,9 +254,9 @@ export const AnnotatorSlice = createSlice({
         if ((type !== 'presence' && r.id === payload) ||
           (type === 'presence' && r.label === result.label)) {
           let validations = r.validations;
-          if (validations.find(v => v.annotator === state.user?.id)) {
+          if (validations.find(v => v.annotator === state.userID)) {
             validations = validations.map(v => {
-              if (v.annotator !== state.user?.id) return v;
+              if (v.annotator !== state.userID) return v;
               return {
                 ...v,
                 is_valid: false
@@ -230,7 +264,7 @@ export const AnnotatorSlice = createSlice({
             })
           } else validations.push({
             id: getNewItemID(state.results?.flatMap(r => r.validations) ?? []),
-            annotator: state.user?.id ?? -1,
+            annotator: state.userID ?? -1,
             is_valid: false,
             result: r.id
           })
@@ -244,12 +278,6 @@ export const AnnotatorSlice = createSlice({
       state.userPreferences.spectrogramConfigurationID = payload;
       state.userPreferences.zoomLevel = 1;
     },
-    enableShortcuts: (state) => {
-      state.ui.areShortcutsEnabled = true;
-    },
-    disableShortcuts: (state) => {
-      state.ui.areShortcutsEnabled = false;
-    },
     setPointerPosition: (state, { payload }: { payload: { time: number, frequency: number } }) => {
       state.ui.pointerPosition = payload;
     },
@@ -260,7 +288,8 @@ export const AnnotatorSlice = createSlice({
       payload: { direction: 'in' | 'out', origin?: { x: number; y: number } }
     }) => {
       state.ui.zoomOrigin = action.payload.origin;
-      const max = Math.max(...(state.spectrogram_configurations ?? []).map(s => s.zoom_level))
+      let max = Math.max(...(state.spectrogram_configurations ?? []).map(s => s.zoom_level));
+      max = Math.max(0, max - 1)
       switch (action.payload.direction) {
         case "in":
           state.userPreferences.zoomLevel = Math.min(state.userPreferences.zoomLevel * 2, 2 ** max);
@@ -269,6 +298,12 @@ export const AnnotatorSlice = createSlice({
           state.userPreferences.zoomLevel = Math.max(state.userPreferences.zoomLevel / 2, 1);
           break;
       }
+      if (state.userPreferences.zoomLevel === 1) {
+        state.didSeeAllFile = true;
+      }
+    },
+    setFileIsSeen: (state) => {
+      state.didSeeAllFile = true;
     },
     onPlay: (state) => {
       state.audio.isPaused = false;
@@ -285,19 +320,35 @@ export const AnnotatorSlice = createSlice({
     setAudioSpeed: (state, action: { payload: number }) => {
       state.userPreferences.audioSpeed = action.payload;
     },
+
+    // Acoustic features
+    updateCurrentResultAcousticFeatures(state, { payload }: { payload: Partial<AcousticFeatures> | null }) {
+      state.results = state.results?.map(r => {
+        if (r.id !== state.focusedResultID) return r;
+        if (!payload) return { ...r, acoustic_features: null }
+        return {
+          ...r,
+          acoustic_features: {
+            start_frequency: null,
+            end_frequency: null,
+            has_harmonics: null,
+            steps_count: null,
+            trend: null,
+            relative_max_frequency_count: null,
+            relative_min_frequency_count: null,
+            ...(r.acoustic_features ?? {}),
+            ...payload
+          } satisfies AcousticFeatures
+        }
+      })
+      state.hasChanged = true;
+    }
   },
   extraReducers:
     (builder) => {
       builder.addMatcher(
         AnnotatorAPI.endpoints.retrieve.matchFulfilled,
         (state, { payload }) => {
-          // Reset user preferences if new campaign
-          if (state.campaign?.id !== payload.campaign.id) {
-            state.userPreferences.audioSpeed = 1;
-            state.userPreferences.zoomLevel = 1;
-            const simpleSpectrogramID = payload.spectrogram_configurations.find(s => !s.multi_linear_frequency_scale && !s.linear_frequency_scale)?.id;
-            state.userPreferences.spectrogramConfigurationID = simpleSpectrogramID ?? Math.min(-1, ...payload.spectrogram_configurations.map(s => s.id));
-          }
           // initialize slice
           Object.assign(state, payload);
           state.focusedCommentID = payload.task_comments && payload.task_comments.length > 0 ? payload.task_comments[0].id : undefined;
@@ -305,30 +356,45 @@ export const AnnotatorSlice = createSlice({
           state.focusedLabel = undefined;
           state.focusedConfidenceLabel = getDefaultConfidence(state)?.label;
           state.hasChanged = false;
-          const labelColors = {};
-          for (const label of payload.label_set.labels) {
-            Object.assign(labelColors, { [label]: COLORS[payload.label_set.labels.indexOf(label) % COLORS.length] })
-          }
-          state.labelColors = labelColors;
           state.audio = {
             time: 0,
             isPaused: true,
           }
           state.sessionStart = Date.now();
-          if (state.campaign?.usage === 'Check') {
-            state.results = state.results?.map(r => {
-              if (r.validations.length > 0) return r;
-              return {
-                ...r,
-                validations: [ {
-                  id: -1,
-                  annotator: state.user?.id ?? -1,
-                  is_valid: true,
-                  result: r.id
-                } ]
-              }
-            })
+          state.didSeeAllFile = state.userPreferences.zoomLevel === 1;
+        },
+      )
+      builder.addMatcher(
+        CampaignAPI.endpoints.retrieve.matchFulfilled,
+        (state, { payload }) => {
+          // Reset user preferences if new campaign
+          if (state.campaignID !== payload.id) {
+            state.userPreferences.audioSpeed = 1;
+            state.userPreferences.zoomLevel = 1;
           }
+          state.campaignID = payload.id;
+        },
+      )
+      builder.addMatcher(
+        LabelSetAPI.endpoints.retrieve.matchFulfilled,
+        (state, { payload }) => {
+          const labelColors = {};
+          for (const label of payload.labels) {
+            Object.assign(labelColors, { [label]: COLORS[payload.labels.indexOf(label) % COLORS.length] })
+          }
+          state.labelColors = labelColors;
+        },
+      )
+      builder.addMatcher(
+        ConfidenceSetAPI.endpoints.retrieve.matchFulfilled,
+        (state, { payload }) => {
+          state.confidenceIndicators = payload.confidence_indicators;
+        },
+      )
+      builder.addMatcher(
+        UserAPI.endpoints.getCurrentUser.matchFulfilled,
+        (state, { payload }) => {
+          state.userID = payload.id;
         },
       )
     },
@@ -336,6 +402,7 @@ export const AnnotatorSlice = createSlice({
 
 export const {
   focusResult,
+  focusPresence,
   focusTask,
   updateFocusComment,
   focusConfidence,
@@ -350,13 +417,13 @@ export const {
   selectSpectrogramConfiguration,
   setPointerPosition,
   zoom,
-  enableShortcuts,
-  disableShortcuts,
   leavePointerPosition,
   setTime,
   onPause,
   setAudioSpeed,
   setStopTime,
   onPlay,
-
+  updateCurrentResultAcousticFeatures,
+  updateFocusResultBounds,
+  setFileIsSeen,
 } = AnnotatorSlice.actions

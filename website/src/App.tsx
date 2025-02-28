@@ -77,6 +77,13 @@ const App: React.FC = () => {
           </Layout>
         </Route>
 
+        <Route path="/app/*">
+          {/* APLOSE -> frontend/ */ }
+        </Route>
+        <Route path="/doc/*">
+          {/* APLOSEs doc -> frontend/doc/ */ }
+        </Route>
+
         <Route path="*">
           <Redirect to="/"></Redirect>
         </Route>

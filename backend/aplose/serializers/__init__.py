@@ -1,3 +1,6 @@
 """Aplose authentication serializers"""
 
-from .user import UserSerializer
+from .user import (
+    UserSerializer,
+    UserPasswordUpdateSerializer,
+)

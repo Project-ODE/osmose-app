@@ -1,15 +1,16 @@
-import React, { ReactNode, useEffect, useImperativeHandle, useRef } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { useHistory } from "react-router-dom";
-import { KeypressHandler } from "../audio-annotator.page.tsx";
 import { confirm } from "../../global-components";
 import Tooltip from "react-bootstrap/Tooltip";
 import { IonButton, IonIcon } from "@ionic/react";
 import { caretBack, caretForward } from "ionicons/icons";
 import { useAppSelector } from '@/service/app';
 import { useAnnotatorSubmitService } from "@/services/annotator/submit.service.ts";
-import { useToast } from '@/services/utils/toast.ts';
+import { useToast } from "@/service/ui";
 import { getErrorMessage } from '@/service/function.ts';
+import { KEY_DOWN_EVENT } from "@/service/events";
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 interface Props {
   shortcut: ReactNode;
@@ -33,9 +34,12 @@ export const NavigationShortcutOverlay = React.forwardRef<HTMLDivElement, Props>
   </div>
 ))
 
-export const NavigationButtons = React.forwardRef<KeypressHandler, {
-  campaignID: string
-}>(({ campaignID }, ref) => {
+export const NavigationButtons: React.FC = () => {
+  const {
+    campaignID,
+    annotatorData,
+  } = useAnnotator();
+
   // Services
   const history = useHistory();
   const submitService = useAnnotatorSubmitService();
@@ -45,14 +49,8 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
   const {
     previous_file_id: _previous_file_id,
     next_file_id: _next_file_id,
-    ui,
     hasChanged: _hasChanged,
   } = useAppSelector(state => state.annotator);
-
-  const areShortcutsEnabled = useRef<boolean>(ui.areShortcutsEnabled);
-  useEffect(() => {
-    areShortcutsEnabled.current = ui.areShortcutsEnabled
-  }, [ ui.areShortcutsEnabled ]);
 
   const previous_file_id = useRef<number | null>(_previous_file_id ?? null);
   useEffect(() => {
@@ -70,8 +68,14 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
 
   const isSubmitting = useRef<boolean>(false);
 
-  const handleKeyPressed = (event: KeyboardEvent) => {
-    if (!areShortcutsEnabled.current) return;
+  useEffect(() => {
+    KEY_DOWN_EVENT.add(onKbdEvent);
+    return () => {
+      KEY_DOWN_EVENT.remove(onKbdEvent);
+    }
+  }, []);
+
+  function onKbdEvent(event: KeyboardEvent) {
     switch (event.code) {
       case 'Enter':
       case 'NumpadEnter':
@@ -87,8 +91,6 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
     }
   }
 
-  useImperativeHandle(ref, () => ({ handleKeyPressed }), [ areShortcutsEnabled ])
-
   const submit = async () => {
     isSubmitting.current = true;
     try {
@@ -96,7 +98,7 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
       if (next_file_id.current) {
         history.push(`/annotation-campaign/${ campaignID }/file/${ next_file_id.current }`);
       } else {
-        history.push(`/annotation-campaign/${ campaignID }/file`)
+        history.push(`/annotation-campaign/${ campaignID }`)
       }
     } catch (e: any) {
       toast.presentError(getErrorMessage(e))
@@ -122,10 +124,12 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
     history.push(`/annotation-campaign/${ campaignID }/file/${ next_file_id.current }`);
   }
 
+  if (!annotatorData?.is_assigned) return <div className="col-sm-5"/>
   return (
     <div className="col-sm-5 d-flex justify-content-center">
       <OverlayTrigger overlay={ <Tooltip><NavigationShortcutOverlay shortcut={ <IonIcon icon={ caretBack }/> }
-                                                                    description="load previous recording"/></Tooltip> }>
+                                                                    description="load previous recording"/></Tooltip> }
+                      placement='bottom'>
         <IonButton color={ "primary" }
                    disabled={ isSubmitting.current || previous_file_id.current === null }
                    className="rounded-right-0"
@@ -134,7 +138,8 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
         </IonButton>
       </OverlayTrigger>
       <OverlayTrigger overlay={ <Tooltip><NavigationShortcutOverlay shortcut="Enter"
-                                                                    description="Submit & load next recording"/></Tooltip> }>
+                                                                    description="Submit & load next recording"/></Tooltip> }
+                      placement='bottom'>
         <IonButton color={ "primary" }
                    disabled={ isSubmitting.current }
                    className="rounded-0"
@@ -143,7 +148,8 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
         </IonButton>
       </OverlayTrigger>
       <OverlayTrigger overlay={ <Tooltip><NavigationShortcutOverlay shortcut={ <IonIcon icon={ caretForward }/> }
-                                                                    description="load next recording"/></Tooltip> }>
+                                                                    description="load next recording"/></Tooltip> }
+                      placement='bottom'>
         <IonButton color={ "primary" }
                    disabled={ isSubmitting.current || next_file_id.current === null }
                    className="rounded-left-0"
@@ -153,4 +159,4 @@ export const NavigationButtons = React.forwardRef<KeypressHandler, {
       </OverlayTrigger>
     </div>
   )
-})
+}

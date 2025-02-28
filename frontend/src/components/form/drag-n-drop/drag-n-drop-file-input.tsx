@@ -1,6 +1,6 @@
 import React, { DragEvent, Fragment, useState } from "react";
 import { IonButton, IonIcon, IonSpinner } from "@ionic/react";
-import { cloudUploadOutline } from "ionicons/icons";
+import { cloudUploadOutline, refreshOutline } from "ionicons/icons";
 import './drag-n-drop-file-input.css';
 
 type Props = {
@@ -91,11 +91,11 @@ export const DragNDropFileInput: React.FC<Props> = ({
       { state === DragNDropState.loading && <IonSpinner color="primary"/> }
 
       { state === DragNDropState.fileLoaded && <Fragment>
-        { filename }
+          <p>{ filename }</p>
 
-          <IonButton onClick={ onReset }>
-              Import another file
-              <IonIcon icon={ cloudUploadOutline } slot="end"/>
+          <IonButton onClick={ onReset } className='ion-text-wrap'>
+              Reset
+              <IonIcon icon={ refreshOutline } slot="end"/>
           </IonButton>
       </Fragment> }
 

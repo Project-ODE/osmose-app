@@ -22,7 +22,7 @@ export const SpectrogramConfigurationAPI = createApi({
       query: ({ name, id }) => ({
         url: `export/${ encodeQueryParams({
           annotation_campaigns: id,
-          filename: name.replace(' ', '_') + '_spectrogram_configuration.csv',
+          filename: name.replaceAll(' ', '_') + '_spectrogram_configuration.csv',
         }) }`,
         responseHandler: downloadResponseHandler
       }),

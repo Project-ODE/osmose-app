@@ -5,9 +5,7 @@ export {
   DatasetAPI,
 } from './api';
 
-export {
-  getFileDuration,
-} from './function';
+export * from './function';
 
 export type {
   Dataset,

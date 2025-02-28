@@ -19,6 +19,7 @@ export type BaseAnnotationCampaign = {
   deadline: string | null; // Date
   datasets: Array<string>; // name
   spectro_configs: Array<number>; //pk
+  labels_with_acoustic_features: Array<string>;
 }
 
 /**
@@ -28,6 +29,7 @@ export type AnnotationCampaign = BaseAnnotationCampaign & {
   id: number;
   created_at: string; // Date
   label_set: number; // pk
+  labels_with_acoustic_features: Array<string>; // Labels
   usage: AnnotationCampaignUsage;
   owner: string; // username
   confidence_indicator_set: number | null; // pk
@@ -84,6 +86,7 @@ export type FileData = {
   datasets: Array<string>;
   detectorsForDatasets: { [key in string]: Array<string> }; // dataset -> Array<detector>
   detectors: Array<string>;
+  labels: Array<string>;
 }
 
 export type CampaignErrors = Errors<WriteCheckAnnotationCampaign> & Errors<WriteCreateAnnotationCampaign>;

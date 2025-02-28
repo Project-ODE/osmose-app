@@ -1,8 +1,4 @@
-export {
-  LabelSetAPI,
-  useListLabelSetQuery,
-  useRetrieveLabelSetQuery,
-} from './api';
+export * from './api';
 
 export type {
   LabelSet

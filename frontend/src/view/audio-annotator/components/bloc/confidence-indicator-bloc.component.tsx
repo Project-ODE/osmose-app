@@ -1,18 +1,20 @@
 import React, { Fragment } from "react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
-import { useAppSelector, useAppDispatch } from '@/service/app';
+import { useAppDispatch, useAppSelector } from '@/service/app';
 import { IonChip, IonIcon } from "@ionic/react";
 import { checkmarkOutline } from "ionicons/icons";
 import { focusConfidence } from '@/service/annotator';
+import { useAnnotator } from "@/service/annotator/hook.ts";
 
 
 export const ConfidenceIndicatorBloc: React.FC = () => {
-  const dispatch = useAppDispatch();
   const {
-    focusedConfidenceLabel,
     confidence_set,
-  } = useAppSelector(state => state.annotator)
+  } = useAnnotator();
+
+  const dispatch = useAppDispatch();
+  const focusedConfidenceLabel = useAppSelector(state => state.annotator.focusedConfidenceLabel);
 
   if (!confidence_set) return <Fragment/>;
 

@@ -1,8 +1,8 @@
-import React, { Fragment, useEffect, useMemo } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { FormBloc, Input, Searchbar } from "@/components/form";
 import { Table, TableContent, TableDivider, TableHead } from "@/components/table/table.tsx";
 import { IonButton, IonIcon, IonSpinner } from "@ionic/react";
-import { trashBinOutline } from "ionicons/icons";
+import { lockClosedOutline, trashBinOutline } from "ionicons/icons";
 import styles from './bloc.module.scss';
 import { useAppDispatch, useAppSelector } from '@/service/app';
 import { getDisplayName, useListUsersQuery, User } from '@/service/user';
@@ -14,10 +14,13 @@ import {
   selectDraftFileRange,
   updateDraftFileRange
 } from '@/service/campaign';
-import { useListAnnotationFileRangeQuery, WriteAnnotationFileRange } from '@/service/campaign/annotation-file-range';
+import { WriteAnnotationFileRange } from '@/service/campaign/annotation-file-range';
 import { useListDatasetQuery } from '@/service/dataset';
+import { useAlert } from "@/service/ui";
 
-export const AnnotatorsRangeBloc: React.FC = () => {
+export const AnnotatorsRangeBloc: React.FC<{
+  setIsForced?: (value: true) => void
+}> = ({ setIsForced }) => {
 
   // State
   const dispatch = useAppDispatch();
@@ -27,14 +30,15 @@ export const AnnotatorsRangeBloc: React.FC = () => {
 
   // Services
   const { data: users } = useListUsersQuery()
-  const { data: initialFileRanges } = useListAnnotationFileRangeQuery({ campaignID: currentCampaign?.id ?? -1 })
-  const { data: allDatasets } = useListDatasetQuery();
+  const { data: allDatasets } = useListDatasetQuery(undefined, { skip: !!currentCampaign });
 
   // Memo
   const filesCount = useMemo(() => {
-    if (currentCampaign?.files_count) return currentCampaign?.files_count;
+    if (currentCampaign?.files_count) return currentCampaign.files_count - 1;
     if (!draftCampaign.datasets || draftCampaign.datasets.length === 0) return undefined;
-    return allDatasets?.find(d => draftCampaign.datasets![0] === d.name)?.files_count;
+    const dataset = allDatasets?.find(d => draftCampaign.datasets![0] === d.name);
+    if (!dataset) return undefined;
+    return dataset.files_count - 1;
   }, [ currentCampaign?.files_count, draftCampaign.datasets, allDatasets ]);
   const availableUsers = useMemo(() => {
     if (!filesCount) return users ?? [];
@@ -51,23 +55,12 @@ export const AnnotatorsRangeBloc: React.FC = () => {
     ) ?? [];
   }, [ users, filesCount, draftFileRanges ]);
 
-  // Updates
-  useEffect(() => {
-    for (const range of initialFileRanges ?? []) {
-      dispatch(addDraftFileRange({
-        ...range,
-        first_file_index: range.first_file_index + 1,
-        last_file_index: range.last_file_index + 1,
-      }))
-    }
-  }, [ initialFileRanges ]);
-
   if (!users) return <FormBloc label="Annotators"><IonSpinner/></FormBloc>
   return (
     <FormBloc label="Annotators">
 
       { draftFileRanges.length > 0 &&
-          <Table columns={ 2 }>
+          <Table columns={ 3 }>
               <TableHead isFirstColumn={ true }>Annotator</TableHead>
               <TableHead>
                   File range
@@ -78,6 +71,7 @@ export const AnnotatorsRangeBloc: React.FC = () => {
               <TableDivider/>
             { draftFileRanges.map(range => <AnnotatorRangeLine key={ range.id }
                                                                range={ range }
+                                                               setIsForced={ setIsForced }
                                                                annotator={ users.find(u => u.id === range.annotator)! }
                                                                filesCount={ filesCount ?? 0 }
                                                                onFirstIndexChange={ first_file_index => dispatch(updateDraftFileRange({
@@ -108,11 +102,29 @@ const AnnotatorRangeLine: React.FC<{
   onFirstIndexChange: (index: number) => void,
   onLastIndexChange: (index: number) => void,
   onDelete: () => void,
-}> = ({ range, annotator, filesCount, onFirstIndexChange, onLastIndexChange, onDelete }) => {
-  const disabled = useMemo(() => {
-    if (range.finished_tasks_count === undefined) return false;
-    return range.finished_tasks_count > 0;
-  }, [ range.finished_tasks_count ])
+  setIsForced?: (value: true) => void
+}> = ({ range, annotator, filesCount, onFirstIndexChange, onLastIndexChange, onDelete, setIsForced }) => {
+  const [ isLocked, setIsLocked ] = useState<boolean>(!!range.finished_tasks_count);
+  const alert = useAlert();
+
+  function unlock() {
+    alert.present({
+      message: `This annotator has already started to annotated. By updating its file range you could remove some annotations he/she made. Are you sure?`,
+      cssClass: 'danger-confirm-alert',
+      buttons: [
+        {
+          text: `Update file range`,
+          cssClass: 'ion-color-danger',
+          handler: () => {
+            setIsLocked(false)
+            if (setIsForced) setIsForced(true)
+          }
+        },
+        'Cancel',
+      ]
+    })
+  }
+
   return (
     <Fragment key={ range.id }>
       <TableContent isFirstColumn={ true }>
@@ -120,32 +132,32 @@ const AnnotatorRangeLine: React.FC<{
       </TableContent>
       <TableContent>
         <div className={ styles.fileRangeCell }>
-          { disabled &&
-              <span data-tooltip={ 'This user as already started to annotate' }>{ range.first_file_index! }</span> }
-          { !disabled && <Input type="number"
-                                value={ range.first_file_index }
-                                onChange={ e => onFirstIndexChange(+e.target.value) }
-                                placeholder="1"
-                                min={ 1 } max={ filesCount }
-                                disabled={ filesCount === undefined }/> }
+          <Input type="number"
+                 value={ range.first_file_index ?? '' }
+                 onChange={ e => onFirstIndexChange(+e.target.value) }
+                 placeholder="1"
+                 min={ 1 } max={ filesCount }
+                 disabled={ filesCount === undefined || isLocked }/>
           -
-          { disabled &&
-              <span data-tooltip={ 'This user as already started to annotate' }>{ range.last_file_index! }</span> }
-          { !disabled && <Input type="number"
-                                value={ range.last_file_index }
-                                onChange={ e => onLastIndexChange(+e.target.value) }
-                                placeholder={ filesCount?.toString() }
-                                min={ 1 } max={ filesCount }
-                                disabled={ filesCount === undefined }/> }
+          <Input type="number"
+                 value={ range.last_file_index ?? '' }
+                 onChange={ e => onLastIndexChange(+e.target.value) }
+                 placeholder={ filesCount?.toString() }
+                 min={ 1 } max={ filesCount }
+                 disabled={ filesCount === undefined || isLocked }/>
         </div>
       </TableContent>
       <TableContent>
-        <IonButton disabled={ disabled }
-                   color="danger"
-                   data-tooltip={ 'This user as already started to annotate' }
-                   onClick={ onDelete }>
+        { isLocked ? <IonButton color='medium' fill='outline'
+                                data-tooltip={ 'This user as already started to annotate' }
+                                className={ [ styles.annotatorButton, 'tooltip-right' ].join(' ') }
+                                onClick={ unlock }>
+          <IonIcon icon={ lockClosedOutline }/>
+        </IonButton> : <IonButton color="danger"
+                                  className={ styles.annotatorButton }
+                                  onClick={ onDelete }>
           <IonIcon icon={ trashBinOutline }/>
-        </IonButton>
+        </IonButton> }
       </TableContent>
       <TableDivider/>
     </Fragment>

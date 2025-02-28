@@ -1,4 +1,5 @@
 """Annotator viewset"""
+
 from django.db import transaction
 
 # pylint: disable=protected-access
@@ -13,20 +14,18 @@ from backend.api.models import (
     AnnotationCampaign,
     DatasetFile,
     AnnotationTask,
+    AnnotationFileRange,
 )
 from backend.api.serializers import (
     AnnotationSessionSerializer,
 )
 from backend.api.views import (
-    AnnotationCampaignViewSet,
     AnnotationCommentViewSet,
     AnnotationResultViewSet,
-    ConfidenceIndicatorSetViewSet,
     DatasetFileViewSet,
     SpectrogramConfigurationViewSet,
-    LabelSetViewSet,
 )
-from .user import UserViewSet
+from backend.api.views.annotation.file_range import AnnotationFileRangeFilesFilter
 
 
 # TODO: test !!!! and update result post ones
@@ -40,46 +39,44 @@ class AnnotatorViewSet(viewsets.ViewSet):
         url_name="campaign-file",
     )
     def get_file(self, request: Request, campaign_id: int, file_id: int):
+        # pylint: disable=too-many-locals
         """Get all data for annotator"""
 
-        campaign = AnnotationCampaignViewSet.as_view({"get": "retrieve"})(
-            request._request,
-            pk=campaign_id,
-        ).data
-        file = DatasetFileViewSet.as_view({"get": "retrieve"})(
-            request._request,
-            pk=file_id,
-        ).data
-        user = UserViewSet.as_view({"get": "self"})(request._request).data
-
-        request._request.GET = {
-            "annotation_campaign_id": campaign_id,
-            "dataset_file_id": file_id,
-            "for_current_user": True,
-        }
-        results = AnnotationResultViewSet.as_view({"get": "list"})(
-            request._request
-        ).data
-        request._request.GET = {
-            "annotation_campaign_id": campaign_id,
-            "dataset_file_id": file_id,
-            "annotation_result__isnull": True,
-            "for_current_user": True,
-        }
-        task_comments = AnnotationCommentViewSet.as_view({"get": "list"})(
-            request._request
-        ).data
-
-        request._request.GET = {
-            "annotationcampaign__id": campaign_id,
-        }
-        label_set = LabelSetViewSet.as_view({"get": "list"})(request._request).data[0]
-        confidence_set_data = ConfidenceIndicatorSetViewSet.as_view({"get": "list"})(
-            request._request
-        ).data
-        confidence_set = (
-            confidence_set_data[0] if len(confidence_set_data) > 0 else None
+        file_ranges = AnnotationFileRange.objects.filter(
+            annotation_campaign_id=campaign_id,
+            annotator_id=request.user.id,
         )
+        is_assigned = file_ranges.filter(
+            first_file_id__lte=file_id,
+            last_file_id__gte=file_id,
+        ).exists()
+        filtered_files = AnnotationFileRangeFilesFilter().filter_queryset(
+            request, file_ranges, self
+        )
+
+        # User previous results
+        results = []
+        task_comments = []
+        if is_assigned:
+            request._request.GET = {
+                "annotation_campaign_id": campaign_id,
+                "dataset_file_id": file_id,
+                "for_current_user": True,
+            }
+            results = AnnotationResultViewSet.as_view({"get": "list"})(
+                request._request
+            ).data
+            request._request.GET = {
+                "annotation_campaign_id": campaign_id,
+                "dataset_file_id": file_id,
+                "annotation_result__isnull": True,
+                "for_current_user": True,
+            }
+            task_comments = AnnotationCommentViewSet.as_view({"get": "list"})(
+                request._request
+            ).data
+
+        # Spectrogram configurations
         request._request.GET = {
             "annotation_campaigns__id": campaign_id,
         }
@@ -87,33 +84,57 @@ class AnnotatorViewSet(viewsets.ViewSet):
             {"get": "list"}
         )(request._request).data
 
-        campaign_files = AnnotationCampaign.objects.get(
-            pk=campaign_id
-        ).get_sorted_files()
         current_file = DatasetFile.objects.get(pk=file_id)
-        previous_file: DatasetFile = campaign_files.filter(
+
+        min_id = min(file_ranges.values_list("first_file_id", flat=True))
+        max_id = max(file_ranges.values_list("last_file_id", flat=True))
+
+        all_files = DatasetFile.objects.filter(
+            dataset__annotation_campaigns=campaign_id,
+            id__gte=min_id,
+            id__lte=max_id,
+        )
+
+        previous_file: DatasetFile = filtered_files.filter(
             Q(start__lt=current_file.start)
             | Q(start=current_file.start, id__lt=current_file.id)
         ).last()
-        next_file = campaign_files.filter(
+        next_file = filtered_files.filter(
             Q(start__gt=current_file.start)
             | Q(start=current_file.start, id__gt=current_file.id)
         ).first()
 
+        index_filter = Q(start__lt=current_file.start) | Q(
+            start=current_file.start, id__lt=current_file.id
+        )
+
+        current_task_index_in_filter = filtered_files.filter(index_filter).count()
+        current_task_index = all_files.filter(index_filter).count()
+
         return Response(
             {
-                "campaign": campaign,
-                "file": file,
-                "user": user,
+                "current_task_index_in_filter": current_task_index_in_filter,
+                "total_tasks_in_filter": filtered_files.count(),
+                "current_task_index": current_task_index,
+                "total_tasks": all_files.count(),
+                "is_submitted": AnnotationTask.objects.filter(
+                    annotation_campaign_id=campaign_id,
+                    dataset_file_id=file_id,
+                    annotator_id=request.user.id,
+                    status=AnnotationTask.Status.FINISHED,
+                ).exists(),
+                "file": DatasetFileViewSet.as_view({"get": "retrieve"})(
+                    request._request,
+                    pk=file_id,
+                ).data,
                 "results": results,
                 "task_comments": task_comments,
-                "label_set": label_set,
-                "confidence_set": confidence_set,
                 "spectrogram_configurations": spectrogram_configurations,
                 "previous_file_id": previous_file.id
                 if previous_file is not None
                 else None,
                 "next_file_id": next_file.id if next_file is not None else None,
+                "is_assigned": is_assigned,
             },
             status=status.HTTP_200_OK,
         )

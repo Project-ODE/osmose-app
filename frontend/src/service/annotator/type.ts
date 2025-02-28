@@ -1,11 +1,10 @@
-import { AnnotationCampaign } from '@/service/campaign';
 import { DatasetFile } from '@/service/dataset';
-import { User } from '@/service/user';
 import { AnnotationResult, WriteAnnotationResult } from '@/service/campaign/result';
-import { LabelSet } from '@/service/campaign/label-set';
-import { ConfidenceIndicatorSet } from '@/service/campaign/confidence-set';
 import { SpectrogramConfiguration } from '@/service/dataset/spectrogram-configuration';
 import { AnnotationComment, WriteAnnotationComment } from '@/service/campaign/comment';
+import { ConfidenceIndicator } from "@/service/campaign/confidence-set";
+import { ID } from "@/service/type.ts";
+import { FileFilters } from "@/service/ui/type.ts";
 
 export type AnnotatorState = Partial<AnnotatorData> & {
   focusedResultID?: number,
@@ -20,30 +19,36 @@ export type AnnotatorState = Partial<AnnotatorData> & {
     zoomLevel: number;
   },
   ui: {
-    areShortcutsEnabled: boolean;
     pointerPosition?: { time: number, frequency: number },
     zoomOrigin?: { x: number, y: number },
   },
+  didSeeAllFile: boolean,
   audio: {
     time: number;
     isPaused: boolean;
     stopTime?: number;
   },
   sessionStart: number;
+  confidenceIndicators?: ConfidenceIndicator[];
 }
 
 
 export type AnnotatorData = {
-  campaign: AnnotationCampaign;
+  is_submitted: boolean;
+  is_assigned: boolean; // Is the user allowed to edit this file
+  campaignID: number;
+  userID: number
   file: DatasetFile;
-  user: User;
   results: Array<AnnotationResult>;
   task_comments: Array<AnnotationComment>;
-  label_set: LabelSet;
-  confidence_set: ConfidenceIndicatorSet | null;
   spectrogram_configurations: Array<SpectrogramConfiguration>;
   previous_file_id: number | null;
   next_file_id: number | null;
+
+  current_task_index: number;
+  total_tasks: number;
+  current_task_index_in_filter: number;
+  total_tasks_in_filter: number;
 }
 
 export type WriteAnnotatorData = {
@@ -56,3 +61,5 @@ export type WriteAnnotatorData = {
 }
 
 export type ResultType = 'presence' | 'point' | 'box';
+
+export type RetrieveParams = { campaignID: ID, fileID: ID, filters: Partial<FileFilters> }
