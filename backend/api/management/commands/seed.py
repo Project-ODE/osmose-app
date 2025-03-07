@@ -404,7 +404,9 @@ class Command(management.BaseCommand):
         labels = self.label_sets[0].labels.values_list("id", flat=True)
         file_range: AnnotationFileRange
         for file_range in campaign.annotation_file_ranges.all():
-            done_files = file_range.get_files()[: randint(5, max(self.files_nb - 5, 5))]
+            done_files = DatasetFile.objects.filter_for_file_range(file_range)[
+                : randint(5, max(self.files_nb - 5, 5))
+            ]
             for file in done_files:
                 task = AnnotationTask.objects.create(
                     dataset_file=file,

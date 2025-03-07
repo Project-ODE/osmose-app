@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.db.models import QuerySet, Q
 from django.utils import timezone
 from metadatax.models import ChannelConfiguration
 
@@ -70,22 +71,26 @@ class Dataset(models.Model):
         ChannelConfiguration, related_name="aplose_datasets"
     )
 
-    def get_files(self, start: datetime, end: datetime):
-        """Get dataset files from absolute start and ends"""
-        dataset_files_start = self.files.filter(
-            start__lte=start,
-            end__gte=start,
+
+class DatasetFileManage(models.Manager):
+    def filter_matches_time_range(
+        self, start: datetime, end: datetime
+    ) -> QuerySet["DatasetFile"]:
+        """Get files from absolute start and ends"""
+        dataset_files_start = Q(start__lte=start, end__gte=start)
+        dataset_files_while = Q(start__gt=start, end__lt=end)
+        dataset_files_end = Q(start__lte=end, end__gte=end)
+        return self.filter(
+            dataset_files_start | dataset_files_while | dataset_files_end
+        ).order_by("start", "id")
+
+    def filter_for_file_range(self, file_range: "AnnotationFileRange"):
+        """Get files for a given file range"""
+        return self.filter(
+            dataset__in=file_range.annotation_campaign.datasets.all(),
+            id__gte=file_range.first_file_id,
+            id__lte=file_range.last_file_id,
         )
-        dataset_files_while = self.files.filter(
-            start__gt=start,
-            end__lt=end,
-        )
-        dataset_files_end = self.files.filter(
-            start__lte=end,
-            end__gte=end,
-        )
-        result = dataset_files_start | dataset_files_while | dataset_files_end
-        return result.order_by("start")
 
 
 class DatasetFile(models.Model):
@@ -105,6 +110,8 @@ class DatasetFile(models.Model):
 
     def __str__(self):
         return str(self.filename)
+
+    objects = DatasetFileManage()
 
     filename = models.CharField(max_length=255)
     filepath = models.CharField(max_length=255)

@@ -171,7 +171,7 @@ class AnnotatorViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_403_FORBIDDEN)
         all_files = []
         for file_range in file_ranges:
-            all_files += list(file_range.get_files())
+            all_files += list(DatasetFile.objects.filter_for_file_range(file_range))
         if file not in all_files:
             return Response(status=status.HTTP_403_FORBIDDEN)
 

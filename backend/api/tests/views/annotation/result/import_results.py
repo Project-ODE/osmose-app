@@ -271,7 +271,6 @@ class ImportCampaignOwnerAuthenticatedTestCase(ImportBaseUserAuthenticatedTestCa
             url,
             f"{os.path.dirname(os.path.realpath(__file__))}/import_csv/point_annotation_no_end_frequency.csv",
         )
-        print("response", response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(AnnotationResult.objects.count(), old_count + 1)
 

@@ -8,6 +8,7 @@ from backend.api.models import (
     AnnotationTask,
     AnnotationResult,
     AnnotationCampaign,
+    DatasetFile,
 )
 from backend.aplose.models import User
 from backend.utils.serializers import EnumField
@@ -182,7 +183,7 @@ class AnnotationFileRangeFilesSerializer(AnnotationFileRangeSerializer):
 
     def get_files(self, file_range: AnnotationFileRange):
         """Get files within the range"""
-        files = file_range.get_files().annotate(
+        files = DatasetFile.objects.filter_for_file_range(file_range).annotate(
             is_submitted=Exists(
                 AnnotationTask.objects.filter(
                     annotation_campaign_id=file_range.annotation_campaign_id,

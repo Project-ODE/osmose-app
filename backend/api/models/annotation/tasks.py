@@ -119,15 +119,6 @@ class AnnotationFileRange(models.Model):
         self._get_tasks().filter(other_range_exist=False).delete()
         return super().delete(using, keep_parents)
 
-    def get_files(self) -> QuerySet[DatasetFile]:
-        """Get corresponding dataset files"""
-        # pylint: disable=no-member
-        return DatasetFile.objects.filter(
-            dataset__in=self.annotation_campaign.datasets.values_list("id", flat=True),
-            id__gte=self.first_file_id,
-            id__lte=self.last_file_id,
-        )
-
     @staticmethod
     def get_connected_ranges(data):
         """Recover connected ranges"""
